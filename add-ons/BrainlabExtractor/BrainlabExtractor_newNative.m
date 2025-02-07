@@ -29,14 +29,29 @@ name_suggestion = [anatomy,'___',pathcell{end}, '_',filename(1:end-4)];
 name = newid({'Save this warp as: '},'Arena',1,{name_suggestion});
 
 %Algorithm----
-[native_V, ~] = keep_largest_face_component(native_V, native_F);
-norm_pca = compute_pca_landmarks(norm_V);       
-native_pca = compute_pca_landmarks(native_V); 
-[R, t, s] = compute_similarity_transform(norm_pca, native_pca);
-T = eye(4);
-T(1:3,1:3) = R*eye(3)*s;
-T(1:3,4) = t;
-T = T';
+    [native_V, ~] = keep_largest_face_component(native_V, native_F);
+    %initial move (coarse):
+    norm_pca = compute_pca_landmarks(norm_V);       
+    native_pca = compute_pca_landmarks(native_V); 
+    [R_init, t_init, s_init] = compute_similarity_transform(norm_pca, native_pca);
+    norm_V_coarse = (R_init * (norm_V' * s_init))' + t_init';
+
+    T = eye(4);
+    T(1:3,1:3) = R_init*eye(3)*s_init;
+    T(1:3,4) = t_init;
+    T_coarse = T';
+
+    %second move (fine):
+    pcNorm = pointCloud(norm_V_coarse); %BE AWARE: THIS IS NOT AN ARENA POINTCLOUD
+    pcNat = pointCloud(native_V);
+    [T_fine, pcNorm_icp, rmse] = pcregistericp(pcNorm, pcNat,...
+        'Metric','pointToPlane',...
+        'MaxIterations', 50,...
+        'Tolerance',[0.001, 0.001]); 
+    
+
+
+    T = T_coarse * T_fine.T;
 %-------------
     
 %Save 
