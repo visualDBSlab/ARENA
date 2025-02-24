@@ -4409,7 +4409,7 @@ classdef ArenaScene < handle
                     case 'Slicei'
                         mapVD = scene.Actors(selection).Data.parent;
                     case 'Mesh'
-                        mapVD = scene.Actors(selection).Data.Soure;
+                        mapVD = scene.Actors(selection).Data.Source;
                         if isempty(mapVD)
                             error('This mesh does not contain VoxelData')
                         end
