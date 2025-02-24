@@ -4682,6 +4682,7 @@ classdef ArenaScene < handle
             
             
             function menu_getinfo(hObject,eventdata)
+                disp('analyzing actors..')
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = scene.Actors; %all Actors.
                 
@@ -4726,7 +4727,7 @@ classdef ArenaScene < handle
                         continue
                     end
                 end
-                info=table(Tablecomponents{:})
+                info=table(Tablecomponents{:},'VariableNames', {'name','type','nVoxels','voxelsize','cubic_mm','minValue','maxValue'})
 %             
                 assignin('base','info',info);
                 
