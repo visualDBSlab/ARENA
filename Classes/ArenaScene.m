@@ -3537,7 +3537,8 @@ classdef ArenaScene < handle
                 
                 for iActor = 1:numel(currentActors)
                     thisActor = currentActors(iActor);
-                    newPC = newPC.addVectors(thisActor.Data);
+                    newPC = newPC.addVectors(thisActor.Data,0,thisActor.Tag);
+
                 end
                 newPC.see(scene)
                 
@@ -4192,7 +4193,11 @@ classdef ArenaScene < handle
                                     for iV = 1:numel(thisActor.Data.Vectors)
                                         [closest_distance,~] = sub_calculate_distance_from_point_to_actor(thisActor.Data.Vectors(iV),target);
                                         distances(i) = closest_distance;
-                                        actors{i} = [num2str(iV),'_',thisActor.Tag];
+                                        if length(thisActor.Data.labels)>=iV
+                                            actors{i} = thisActor.Data.labels{iV};
+                                        else
+                                            actors{i} = [num2str(iV),'_',thisActor.Tag];
+                                        end
                                         i = i+1;
                                         
                                     end
@@ -4258,7 +4263,15 @@ classdef ArenaScene < handle
                                     end
                                 end
 
-                            
+                        case 'PointCloud'  
+                            if target.length==1
+                                difference = target.Vectors(1)-v1;
+                                d = difference.norm;
+                                closest_distance = d;
+                                closest_vector = v1;
+                            else
+                                keyboard %not there yet
+                            end
                         otherwise
                             keyboard %not there yet
                     end
@@ -4682,7 +4695,6 @@ classdef ArenaScene < handle
             
             
             function menu_getinfo(hObject,eventdata)
-                disp('analyzing actors..')
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = scene.Actors; %all Actors.
                 
@@ -4727,7 +4739,7 @@ classdef ArenaScene < handle
                         continue
                     end
                 end
-                info=table(Tablecomponents{:},'VariableNames', {'name','type','nVoxels','voxelsize','cubic_mm','minValue','maxValue'})
+                info=table(Tablecomponents{:},'VariableNames', {'name','type','nVoxels','voxelsize','cubic_mm','minValue','maxValue'});
 %             
                 assignin('base','info',info);
                 

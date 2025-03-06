@@ -5,6 +5,10 @@ classdef PointCloud < ArenaActorRendering
         Vectors = Vector3D.empty;
         Weights = [];
     end
+
+    properties(Hidden)
+        labels = {}
+    end
     
     methods
         function obj = PointCloud(vectors,weights)
@@ -40,8 +44,8 @@ classdef PointCloud < ArenaActorRendering
             
         end
         
-        function obj = addVectors(obj,newVectors,newWeight)
-            
+        function obj = addVectors(obj,newVectors,newWeight,newLabel)
+            n_before = obj.length();
             if isa(newVectors,'PointCloud')
                 obj.Vectors = [obj.Vectors;newVectors.Vectors];
                 obj.Weights = [obj.Weights;newVectors.Weights];
@@ -56,6 +60,11 @@ classdef PointCloud < ArenaActorRendering
                     else
                         obj.Weights = [obj.Weights;nan(1,numel(newVectors))];
                     end
+            end
+            n_after = obj.length();
+
+            if nargin==4
+                obj.labels{n_before+1:n_after} = newLabel;
             end
         
         end
