@@ -21,6 +21,7 @@ classdef ArenaActor < handle & matlab.mixin.Copyable
         Tag
         Visible = true;
         Meta
+        Anchor 
     end
     
     methods
@@ -47,8 +48,10 @@ classdef ArenaActor < handle & matlab.mixin.Copyable
                 settings = NaN;
             end
             
+
             visualize(obj,settings,data,scene)
             obj.Tag = class(data);
+            obj.Anchor = obj.getCOG;
             
         end
         

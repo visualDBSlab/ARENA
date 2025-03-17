@@ -62,7 +62,7 @@ classdef Heatmap < handle
         
         
         function bool = has(obj,required)
-            [maplabels,mapsWithContents,maps,index] = getMapOverview(obj);
+            [maplabels,~,~,index] = getMapOverview(obj);
             existing = maplabels(index);
             inCommon = intersect(existing,required);
             if length(inCommon) == length(required)
@@ -73,7 +73,7 @@ classdef Heatmap < handle
                     fprintf(2,[required{m},' is not available within this Heatmap.\n'])
                 end
                 error('Heatmap does not contain the required data for this Sampling Method')
-                bool = false;
+                
             end
                 
                 

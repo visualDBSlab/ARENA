@@ -1225,12 +1225,12 @@ classdef ArenaScene < handle
                         [thisScene.handles.atlas.legacy.Actor_rnright,scene] = obj_rn_right.see(thisScene);
                         
                         
-                        thisScene.handles.atlas.legacy.Actor_stnleft.changeSetting('colorFace',[0 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_snleft.changeSetting('colorFace',[1 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_rnleft.changeSetting('colorFace',[1 0 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_stnright.changeSetting('colorFace',[0 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_snright.changeSetting('colorFace',[1 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_rnright.changeSetting('colorFace',[1 0 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_stnleft.changeSetting('colorFace',[0 1 0],'colorEdge',[0 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_snleft.changeSetting('colorFace',[1 1 0],'colorEdge',[1 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_rnleft.changeSetting('colorFace',[1 0 0],'colorEdge',[1 0 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_stnright.changeSetting('colorFace',[0 1 0],'colorEdge',[0 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_snright.changeSetting('colorFace',[1 1 0],'colorEdge',[1 1 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_rnright.changeSetting('colorFace',[1 0 0],'colorEdge',[1 0 0],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
                         
                         
                         thisScene.handles.atlas.legacy.Actor_stnleft.changeName('[mni] STNleft')
@@ -1264,10 +1264,10 @@ classdef ArenaScene < handle
                         
                         
                         
-                        thisScene.handles.atlas.legacy.Actor_gpileft.changeSetting('colorFace',[0 0 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_gpeleft.changeSetting('colorFace',[0 1 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_gpiright.changeSetting('colorFace',[0 0 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
-                        thisScene.handles.atlas.legacy.Actor_gperight.changeSetting('colorFace',[0 1 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_gpileft.changeSetting('colorFace',[0 0 1],'colorEdge',[0 0 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_gpeleft.changeSetting('colorFace',[0 1 1],'colorEdge',[0 1 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_gpiright.changeSetting('colorFace',[0 0 1],'colorEdge',[0 0 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
+                        thisScene.handles.atlas.legacy.Actor_gperight.changeSetting('colorFace',[0 1 1],'colorEdge',[0 1 1],'faceOpacity',20,'edgeOpacity',0,'complexity',10)
                         
                         thisScene.handles.atlas.legacy.Actor_gpileft.changeName('[mni] GPIleft')
                         thisScene.handles.atlas.legacy.Actor_gpeleft.changeName('[mni] GPEeft')
@@ -4936,7 +4936,14 @@ classdef ArenaScene < handle
                             case 's'
                                 if numel(eventdata.Modifier)>2
                                     show_shortcuts(src);
+                                else
+                                    if ~isfield(scene.handles,'anchors')
+                                        scene.handles.anchors = Anchors.empty();
+                                    end
+                                    scene.handles.anchors(end+1) = A_tooltip(src.UserData);
+                           
                                 end
+                                
                             case 'i'
                                 %this has been replaced by the accelerators
                                 
@@ -5123,7 +5130,8 @@ classdef ArenaScene < handle
             function show_shortcuts(src)
                 msgbox('Something like this Hazem?')
             end
-            
+
+
             function hideLayers(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 [currentActors,iSelected] = ArenaScene.getSelectedActors(scene);
