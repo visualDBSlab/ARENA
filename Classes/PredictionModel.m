@@ -68,31 +68,78 @@ classdef PredictionModel < handle
             obj.TrainingLinearModel
         end
         
-        function f = plotTraining(obj)
-            f = figure;
-             set(f,'defaultTextInterpreter','none')
-            if isempty(obj.TrainingLinearModel);return;end
-            scatter(obj.TrainingLinearModel.Variables.y,...
-                obj.TrainingLinearModel.predict);
-            hold on;
-            line(xlim,xlim,'Color','red','LineStyle','--')
-            xlabel(obj.Heatmap.Tag)
-            ylabel('Model prediction')
-            title({'LOO training model',['Rsquared:', num2str(obj.TrainingLinearModel.Rsquared.Ordinary)]})
+
+        function fig = plotTraining(obj)
+            % fig = figure;
+            %  set(fig,'defaultTextInterpreter','none')
+            % if isempty(obj.TrainingLinearModel);return;end
+            % scatter(obj.TrainingLinearModel.Variables.y,...
+            %     obj.TrainingLinearModel.predict);
+            % hold on;
+            % line(xlim,xlim,'Color','red','LineStyle','--')
+            % xlabel(obj.Heatmap.Tag)
+            % ylabel('Model prediction')
+            % title({'LOO training model',['Rsquared:', num2str(obj.TrainingLinearModel.Rsquared.Ordinary)]})
+
+
+
+            %%
+
+            fig = figure; 
+            obj.TrainingLinearModel.plot
+
+
+            x_text = 'Model score';%; %
+            tag = strsplit(obj.Tag,' ');
+            y_text = tag{2};
+            t_text = ['Leave one out ',y_text];%
+            p = obj.TrainingLinearModel.ModelFitVsNullModel.Pvalue;
+            r2 = obj.TrainingLinearModel.Rsquared.Ordinary;
+            xlabel(x_text);
+            ylabel(y_text,'Interpreter','tex');
+            if p < 0.01
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p <0.01 \rm']},'Interpreter','tex')
+            elseif p < 0.05
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p <0.05 \rm']},'Interpreter','tex')
+            else
+                p = round(p,2);
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p = ',num2str(p),' \rm']},'Interpreter','tex')
+            end
+
+            PredictionModel.styleFig(fig)
+
+
+
+            
         end
         
         function f = plotLOOCV(obj)
             mdl = obj.LOOCV;
-            f = figure;
-             set(f,'defaultTextInterpreter','none')
+
+            fig = figure;
+            mdl.plot;
             
-            scatter(mdl.Variables.y,...
-                mdl.predict);
-            hold on;
-            line(xlim,xlim,'Color','red','LineStyle','--')
-            xlabel(obj.Heatmap.Tag)
-            ylabel('Model prediction')
-            title({'LOOCV',['Rsquared:', num2str(mdl.Rsquared.Ordinary)]})
+
+            x_text = 'Prediction';%; %
+            tag = strsplit(obj.Tag,' ');
+            y_text = tag{2};
+            t_text = ['LOOCV ',y_text];%
+            p = mdl.ModelFitVsNullModel.Pvalue;
+            r2 = mdl.Rsquared.Ordinary;
+            xlabel(x_text);
+            ylabel(y_text,'Interpreter','tex');
+            if p < 0.01
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p <0.01 \rm']},'Interpreter','tex')
+            elseif p < 0.05
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p <0.05 \rm']},'Interpreter','tex')
+            else
+                p = round(p,2);
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p = ',num2str(p),' \rm']},'Interpreter','tex')
+            end
+
+            PredictionModel.styleFig(fig)
+
+
         end
         
         function [prediction,predictors] = predictVoxelData(obj,VD)
@@ -197,5 +244,57 @@ classdef PredictionModel < handle
             end
         end
     end
+    methods (Static)
+        function styleFig(fig)
+
+            %axis and figure:
+hold on
+legend off
+fig.CurrentAxes.Box = 'off';
+fig.CurrentAxes.XLabel.FontSize=14;
+fig.CurrentAxes.YLabel.FontSize=14;
+fig.CurrentAxes.TitleFontSizeMultiplier = 1.5;
+
+
+%data
+h_data = findobj(fig.CurrentAxes,'DisplayName','Data','-or','Tag','data');
+h_data.MarkerSize = 15;
+h_data.Marker = '.';
+h_data.Color = [0 0 0];
+
+%fit
+h_fit = findobj(fig.CurrentAxes,'DisplayName','Fit','-or','Tag','fit');
+h_fit.LineStyle = '--';
+h_fit.Color = [0 0 0];
+
+%confidence
+h_dashedline = findobj(fig.CurrentAxes,'LineStyle',':');
+if numel(h_dashedline)==2
+    x1 = h_dashedline(1).XData;
+    y1 = h_dashedline(1).YData;
+    x2 = h_dashedline(2).XData;
+    y2 = h_dashedline(2).YData;
+    x = [x1,fliplr(x2)];
+    y = [y1,fliplr(y2)];
+    delete(h_dashedline)
+else
+    x = h_dashedline.XData;
+    y = h_dashedline.YData;
+    middle = find(isnan(x));
+    x = [x(1:middle-1),fliplr(x(middle+1:end))];
+    y = [y(1:middle-1),fliplr(y(middle+1:end))];
+    delete(h_dashedline) 
+end
+h_confidence = fill(fig.CurrentAxes,x,y,[0.85 0.85 0.85]);
+h_confidence.LineStyle = 'none';
+set(gca, 'Children', flipud(get(gca, 'Children')) )
+
+%legend
+legend({'95% confidence','trend','data'})
+fig.CurrentAxes.Legend.Location = 'SouthEast';
+
+        end
+    end
+
 end
 
