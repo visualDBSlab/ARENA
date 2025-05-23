@@ -413,6 +413,8 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Mesh.burnIn = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: burn in','callback',{@menu_burnIn},'Enable','off');
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: color Vertex','callback',{@menu_colorVertex},'Enable','off');
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: convex hull','callback',{@menu_convexhull},'Enable','off');
+            obj.handles.menu.dynamic.Mesh.flipNormals = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: flip normals','callback',{@menu_flipNormals},'Enable','off');
+            
             obj.handles.menu.dynamic.ObjFile.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.whereIsIt = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it exactly?','callback',{@menu_WhereIsElectrode},'Enable','off');
@@ -2280,6 +2282,20 @@ classdef ArenaScene < handle
                     actor.changeName(name)
                 end
                 
+            end
+
+            function menu_flipNormals(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor);
+                    source = thisActor.Data;
+                    copy = source.copy();
+                    new_actor = copy.flipnormals().see(scene);
+                    new_actor.changeName(['FlippedNormals_',currentActors(1).Tag])
+
+                end
+
             end
             
             function menu_edit_count2mesh(hObject,eventdata)

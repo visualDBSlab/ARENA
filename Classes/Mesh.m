@@ -107,6 +107,10 @@ classdef Mesh < handle & matlab.mixin.Copyable & ArenaActorRendering
             close(histf)
             
         end
+
+        function obj = flipnormals(obj)
+            obj.Faces = fliplr(obj.Faces);
+        end
         
         function newVD = convertToVoxelsInTemplate(obj,template)
                 [gridX,gridY,gridZ] = template.getlinspace;
@@ -126,7 +130,13 @@ classdef Mesh < handle & matlab.mixin.Copyable & ArenaActorRendering
                 
                 
                 [testTheseX,testTheseY,testTheseZ] = meshgrid(gridXvalues,gridYvalues,gridZvalues);
-                white = inpolyhedron(fv, [testTheseX(:),testTheseY(:),testTheseZ(:)],'flipnormals', true);
+                white = inpolyhedron(fv, [testTheseX(:),testTheseY(:),testTheseZ(:)]);%,'flipnormals', true);
+
+                %if two opposing  corners are white, then the image is
+                %probably inverted
+                if white(1) && white(end)
+                    white = 1-white;
+                end
                 
                 newVoxelInfo = zeros(size(template.Voxels));
                 newVoxelInfo(gridYtest,gridXtest,gridZtest) = reshape(white,size(testTheseX));
