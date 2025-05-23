@@ -412,6 +412,7 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Mesh.shortestDistance = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Mesh: get shortest distance to..','callback',{@menu_shortestDistance},'Enable','off');
             obj.handles.menu.dynamic.Mesh.burnIn = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: burn in','callback',{@menu_burnIn},'Enable','off');
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: color Vertex','callback',{@menu_colorVertex},'Enable','off');
+            obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: convex hull','callback',{@menu_convexhull},'Enable','off');
             obj.handles.menu.dynamic.ObjFile.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.whereIsIt = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it exactly?','callback',{@menu_WhereIsElectrode},'Enable','off');
@@ -3279,7 +3280,7 @@ classdef ArenaScene < handle
                 end
                 
                 if makeCanvas
-                        template_ = currentActors(iActor).Data.makeCanvas;
+                        template_ = currentActors(1).Data.makeCanvas;
                 else
                     switch answer
                         case 'On top of nii data (brainlab)'
@@ -4276,6 +4277,20 @@ classdef ArenaScene < handle
                             keyboard %not there yet
                     end
                 end
+            end
+
+            function menu_convexhull(hObject,eventdata)
+                currentActors = ArenaScene.getSelectedActors(scene);
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor);
+                    vertices = thisActor.Visualisation.handle.Vertices;
+                    [k1,av1] = convhull(vertices(:,1),vertices(:,2),vertices(:,3));
+                    m = ObjFile;
+                    m.Faces = k1;
+                    m.Vertices = vertices;
+                    m.see(scene)
+                end
+
             end
                   
             
