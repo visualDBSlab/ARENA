@@ -419,6 +419,8 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Electrode.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.whereIsIt = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it exactly?','callback',{@menu_WhereIsElectrode},'Enable','off');
             obj.handles.menu.dynamic.Electrode.whereIsItNear = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it near?','callback',{@menu_WhereIsElectrodeNear},'Enable','off');
+            obj.handles.menu.dynamic.Electrode.bodyTransparency = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Electrode: set custom transparancy','callback',{@menu_ElectrodeTransparency},'Enable','off');
+           
             
             obj.handles.menu.dynamic.Slicei.SpatialCorrelation = obj.handles.menu.dynamic.Mesh.SpatialCorrelation;
             obj.handles.menu.dynamic.Slicei.multiply = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: multiply images','callback',{@menu_multiplyslices},'Enable','off');
@@ -3114,6 +3116,59 @@ classdef ArenaScene < handle
                 
                 
             end
+
+            function menu_ElectrodeTransparency(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+
+                %check the first (or only) selected electrode for its
+                %settings:
+                active = or(currentActors(1).Visualisation.settings.cathode,currentActors(1).Visualisation.settings.anode);
+                currentBody = num2str(currentActors(1).Visualisation.handle(1).FaceAlpha*100);
+                if any(active)
+                    AC = find(active,1,'first');
+                    currentActive = num2str(currentActors(1).Visualisation.handle(AC+1).FaceAlpha*100);
+                else
+                    currentActive = '100';
+                end
+                if any(not(active))
+                    IC = find(not(active),1,'first');
+                    currentInActive = num2str(currentActors(1).Visualisation.handle(IC+1).FaceAlpha*100);
+                else
+                    currentInActive = '100';
+                end
+
+
+                prompt = {'Body:','Inactive contact:','Active contact:'};
+                dlgtitle = 'Electrode transparancy';
+                fieldsize = [1 45; 1 45; 1 45];
+                definput = {currentBody,currentInActive,currentActive};
+                answer = inputdlg(prompt,dlgtitle,fieldsize,definput);
+
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor);
+                    
+                    %body
+                    thisActor.Visualisation.handle(1).FaceAlpha = str2num(answer{1})/100;
+
+                    %active contacts
+                    active = or(thisActor.Visualisation.settings.cathode,thisActor.Visualisation.settings.anode);
+                    for iActive = find(active)
+                        thisActor.Visualisation.handle(1+iActive).FaceAlpha = str2num(answer{3})/100;
+                    end
+
+                    %inactive contacts
+                    for iInActive = find(not(active))
+                        thisActor.Visualisation.handle(1+iInActive).FaceAlpha = str2num(answer{2})/100;
+                    end
+
+
+
+
+                end
+            end
+
+
             
             
             function menu_WhereIsElectrodeNear(hObject,eventdata)

@@ -300,6 +300,12 @@ classdef ArenaActor < handle & matlab.mixin.Copyable
         
         function copyobj = duplicate(obj,scene)
             copyobj = copy(obj);
+            switch class(obj.Data)
+                case 'Slicei'
+                    sourceData = obj.Data.parent.copy();
+                    copyobj = sourceData.getslice.see(scene);
+                otherwise
+
             copyobj.Data  = copy(obj.Data);
 %             switch class(copyobj.Data)
 %                 case 'Mesh'
@@ -319,7 +325,8 @@ classdef ArenaActor < handle & matlab.mixin.Copyable
 %                     %if it crashes here: make a new case for this class.
 %                 
 %             end
-            copyobj = copyobj.reviveInScene(scene);
+                copyobj = copyobj.reviveInScene(scene);
+            end
             %scene.refreshLayers();
         end
         
