@@ -419,7 +419,7 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Electrode.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.whereIsIt = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it exactly?','callback',{@menu_WhereIsElectrode},'Enable','off');
             obj.handles.menu.dynamic.Electrode.whereIsItNear = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it near?','callback',{@menu_WhereIsElectrodeNear},'Enable','off');
-            obj.handles.menu.dynamic.Electrode.bodyTransparency = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Electrode: set custom transparancy','callback',{@menu_ElectrodeTransparency},'Enable','off');
+            obj.handles.menu.dynamic.Electrode.bodyTransparency = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Electrode: set custom opacity','callback',{@menu_ElectrodeOpacity},'Enable','off');
            
             
             obj.handles.menu.dynamic.Slicei.SpatialCorrelation = obj.handles.menu.dynamic.Mesh.SpatialCorrelation;
@@ -3117,7 +3117,7 @@ classdef ArenaScene < handle
                 
             end
 
-            function menu_ElectrodeTransparency(hObject,eventdata)
+            function menu_ElectrodeOpacity(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
 
@@ -3140,7 +3140,7 @@ classdef ArenaScene < handle
 
 
                 prompt = {'Body:','Inactive contact:','Active contact:'};
-                dlgtitle = 'Electrode transparancy';
+                dlgtitle = 'Electrode opacity';
                 fieldsize = [1 45; 1 45; 1 45];
                 definput = {currentBody,currentInActive,currentActive};
                 answer = inputdlg(prompt,dlgtitle,fieldsize,definput);
