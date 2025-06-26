@@ -933,6 +933,9 @@ classdef ArenaScene < handle
                     thisCOG = PointCloud(thisActor.getCOG).see(scene);
                     thisCOG.changeName(['COG: ',thisActor.Tag])
                     thisCOG.changeSetting('colorLow',thisActor.Visualisation.settings.colorFace)
+
+                    disp('MNI coordinates (mm) Right/Anterior/Superior:')
+                    thisCOG.Data.Vectors
                     
                 end
                 
