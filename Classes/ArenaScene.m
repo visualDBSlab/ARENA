@@ -378,8 +378,10 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.modify.main = uimenu(obj.handles.menu.dynamic.main ,'Text','Modify');
             obj.handles.menu.dynamic.analyse.main = uimenu(obj.handles.menu.dynamic.main ,'Text','Analyse');
             obj.handles.menu.dynamic.generate.main = uimenu(obj.handles.menu.dynamic.main ,'Text','Generate');
+            obj.handles.menu.dynamic.presets.main = uimenu(obj.handles.menu.dynamic.main ,'Text','Presets');
             
-            
+
+            obj.handles.menu.dynamic.Slicei.cluster = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [STUDY NAME]','callback',{@menu_extractClusters1},'Enable','off');
             obj.handles.menu.dynamic.ObjFile.obj2mesh = uimenu(obj.handles.menu.dynamic.generate.main,'Text','ObjFile: convert to Mesh','callback',{@menu_obj2mesh},'Enable','off');
             
             
@@ -934,6 +936,61 @@ classdef ArenaScene < handle
                     
                 end
                 
+            end
+
+            function menu_extractClusters1(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+
+                %--- Presets
+                SMOOTHING_KERNEL_SIZE = 0;
+                POSITIVE_THRESHOLD = 0;
+                NEGATIVE_THRESHOLD = -0;
+                CLUSTER_SIZE = 0;
+
+               
+                disp('### Clustering presets for [STUDYNAME] ###')
+                
+                for iActor = 1:numel(currentActors)
+                    actor = currentActors(iActor);
+                    vd = currentActors(iActor).Data.parent.copy(); %copy to make sure smoothing operations do not overwrite source data
+
+                    disp(['Smoothing with kernel size: ',num2str(3)])
+                    vd.smooth(SMOOTHING_KERNEL_SIZE);
+
+                    disp(['Thresholding <',num2str(NEGATIVE_THRESHOLD)])
+                    vd_low = vd < NEGATIVE_THRESHOLD;
+
+                    disp(['Thresholding >',num2str(POSITIVE_THRESHOLD)])
+                    vd_high = vd > POSITIVE_THRESHOLD;
+
+                    [regions,labeled,sizelist] = vd_low.seperateROI();
+                    for iCluster = 2:numel(sizelist) 
+                        if sizelist(iCluster)>=CLUSTER_SIZE
+                            new_actor = regions{iCluster}.getmesh(0.5).see(scene);
+                            new_actor.changeName(['[LOW]',num2str(sizelist(iCluster)),'voxels - based on: ',actor.Tag]);
+                        end
+                    end
+
+                    [regions,labeled,sizelist] = vd_high.seperateROI();
+                    for iCluster = 2:numel(sizelist)
+                        if sizelist(iCluster)>=CLUSTER_SIZE
+                            new_actor = regions{iCluster}.getmesh(0.5).see(scene);
+                            new_actor.changeName(['[HIGH]',num2str(sizelist(iCluster)),'voxels - based on: ',actor.Tag]);
+                        end
+                    end
+                   
+                   
+
+
+
+
+
+
+                    
+                    
+                    
+                end
             end
             
             function menu_moveTransformationMatrix(hObject,eventdata)
@@ -5327,9 +5384,9 @@ classdef ArenaScene < handle
             thisActor = ArenaActor;
             
             if nargin==3 %when reviving an actor in a new scene.
-                thisActor.create(data,obj,OPTIONALvisualisation)
+                thisActor.create(data,obj,OPTIONALvisualisation);
             else
-                thisActor.create(data,obj)
+                thisActor.create(data,obj);
             end
             obj.Actors(end+1) = thisActor;
             refreshLayers(obj);
@@ -5395,7 +5452,7 @@ classdef ArenaScene < handle
             for iOther = 1:numel(otherclasses)
                 thisOtherClass = otherclasses{iOther};
                 switch thisOtherClass
-                    case {'main','modify','analyse','generate'}
+                    case {'main','modify','analyse','generate','presets'}
                         continue
                     otherwise
                         functions = fieldnames(obj.handles.menu.dynamic.(thisOtherClass));

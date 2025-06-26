@@ -209,9 +209,9 @@ classdef Mesh < handle & matlab.mixin.Copyable & ArenaActorRendering
             if isempty(thisScene);return;end %user cancels
             thisActor = thisScene.newActor(obj);
             if not(isempty(inputname(1)))
-                thisActor.changeName(inputname(1))
+                thisActor.changeName(inputname(1));
             elseif not(isempty(obj.Label))
-                thisActor.changeName(obj.Label)
+                thisActor.changeName(obj.Label);
             
                 
             end

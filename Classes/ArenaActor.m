@@ -49,7 +49,7 @@ classdef ArenaActor < handle & matlab.mixin.Copyable
             end
             
 
-            visualize(obj,settings,data,scene)
+            visualize(obj,settings,data,scene);
             obj.Tag = class(data);
             obj.Anchor = obj.getCOG;
             
