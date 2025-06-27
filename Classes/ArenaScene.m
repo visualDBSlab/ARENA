@@ -381,7 +381,7 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.presets.main = uimenu(obj.handles.menu.dynamic.main ,'Text','Presets');
             
 
-            obj.handles.menu.dynamic.Slicei.cluster = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [STUDY NAME]','callback',{@menu_extractClusters1},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.cluster = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [GPiPD_spots]','callback',{@menu_extractClusters1},'Enable','off');
             obj.handles.menu.dynamic.ObjFile.obj2mesh = uimenu(obj.handles.menu.dynamic.generate.main,'Text','ObjFile: convert to Mesh','callback',{@menu_obj2mesh},'Enable','off');
             
             
@@ -946,13 +946,13 @@ classdef ArenaScene < handle
                 currentActors = ArenaScene.getSelectedActors(scene);
 
                 %--- Presets
-                SMOOTHING_KERNEL_SIZE = 0;
-                POSITIVE_THRESHOLD = 0;
-                NEGATIVE_THRESHOLD = -0;
-                CLUSTER_SIZE = 0;
+                SMOOTHING_KERNEL_SIZE = 3;
+                POSITIVE_THRESHOLD = 0.95;
+                NEGATIVE_THRESHOLD = -0.95;
+                CLUSTER_SIZE = 50;
 
                
-                disp('### Clustering presets for [STUDYNAME] ###')
+                disp('### Clustering presets for [GPiPD_spots] ###')
                 
                 for iActor = 1:numel(currentActors)
                     actor = currentActors(iActor);
@@ -970,7 +970,7 @@ classdef ArenaScene < handle
                     [regions,labeled,sizelist] = vd_low.seperateROI();
                     for iCluster = 2:numel(sizelist) 
                         if sizelist(iCluster)>=CLUSTER_SIZE
-                            new_actor = regions{iCluster}.getmesh(0.5).see(scene);
+                            new_actor = regions{iCluster}.smooth(3).getmesh(0.1).see(scene);
                             new_actor.changeName(['[LOW]',num2str(sizelist(iCluster)),'voxels - based on: ',actor.Tag]);
                         end
                     end
@@ -978,7 +978,7 @@ classdef ArenaScene < handle
                     [regions,labeled,sizelist] = vd_high.seperateROI();
                     for iCluster = 2:numel(sizelist)
                         if sizelist(iCluster)>=CLUSTER_SIZE
-                            new_actor = regions{iCluster}.getmesh(0.5).see(scene);
+                            new_actor = regions{iCluster}.smooth(3).getmesh(0.1).see(scene);
                             new_actor.changeName(['[HIGH]',num2str(sizelist(iCluster)),'voxels - based on: ',actor.Tag]);
                         end
                     end
