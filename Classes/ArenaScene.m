@@ -936,6 +936,9 @@ classdef ArenaScene < handle
 
                     disp('MNI coordinates (mm) Right/Anterior/Superior:')
                     thisCOG.Data.Vectors
+
+                    disp('ACPC coordinates (mm) Right/Anterior/Superior:')
+                    A_MNI2ACPC(thisCOG.Data.Vectors)
                     
                 end
                 
