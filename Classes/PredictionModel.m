@@ -126,15 +126,25 @@ classdef PredictionModel < handle
             t_text = ['LOOCV ',y_text];%
             p = mdl.ModelFitVsNullModel.Pvalue;
             r2 = mdl.Rsquared.Ordinary;
+                
+            q2 = A_q2(mdl.Variables.x1,mdl.Variables.y);
+            disp(['The exact prediction quality q^2: ',num2str(q2)])
+            if q2>0
+                q2_text = [', q^2 = ',num2str(round(q2,2))];
+            else
+                q2_text = '';
+            end
+
+
             xlabel(x_text);
             ylabel(y_text,'Interpreter','tex');
             if p < 0.01
-                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p <0.01 \rm']},'Interpreter','tex')
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(round(r2,2)),', p <0.01',q2_text,'\rm']},'Interpreter','tex')
             elseif p < 0.05
-                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p <0.05 \rm']},'Interpreter','tex')
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(round(r2,2)),', p <0.05',q2_text,' \rm']},'Interpreter','tex')
             else
                 p = round(p,2);
-                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(r2),', p = ',num2str(p),' \rm']},'Interpreter','tex')
+                title({['\bf ',t_text];['\rm \fontsize{12} r^2 = ',num2str(round(r2,2)),', p = ',num2str(p),' \rm']},'Interpreter','tex')
             end
 
             PredictionModel.styleFig(fig)
