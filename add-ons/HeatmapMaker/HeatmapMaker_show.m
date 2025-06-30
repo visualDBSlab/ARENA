@@ -29,6 +29,7 @@ minValue = min(t.(label));
 maxValue = max(t.(label));
 printwhendone = {};
 if strcmp(t.Properties.VariableNames{1},'folderID')
+
 for i = 1:height(t)
     filesInFolder = A_getfiles(fullfile(t.fullpath{i},'*.nii'));
     for j = 1:numel(filesInFolder)
@@ -63,6 +64,7 @@ for i = 1:height(t)
     actor.changeName([t.folderID{i},'_',filesInFolder(j).name])
     end
     
+
         
 
 
@@ -71,10 +73,39 @@ disp('---')
     cellfun(@disp,printwhendone)
     disp('---')
     disp('It is recommended to check the list above to see if mirroring was done correctly')
-         
 
+elseif strcmp(t.Properties.VariableNames{1},'fileID')
 
-
+    for i = 1:height(t)
+        vd = VoxelData(t.fullpath{i});
+        
+        
+        %Mirror to the left.
+        cog =  vd.getcog;
+        if cog.x>1 && t.Move_or_keep_left(i)
+            vd.mirror;
+            printwhendone{end+1} = ['____mirrored: ',t.fullpath{i}];
+        else
+            printwhendone{end+1} = ['not_mirrored: ',t.fullpath{i}];
+        end
+        
+                            
+        actor = vd.getmesh(0.5).see(scene);
+        
+        %color
+        Weight = t.(label)(i);
+        WeightN = (Weight-minValue)/(maxValue-minValue);
+        if isnan(WeightN) %no difference in scores in the heatmap
+            WeightN = 0;
+        end
+            
+        r = interp1([0,0.5,1],[low(1),medium(1),high(1)],WeightN);
+        g = interp1([0,0.5,1],[low(2),medium(2),high(2)],WeightN);
+        b = interp1([0,0.5,1],[low(3),medium(3),high(3)],WeightN);
+        actor.changeSetting('colorFace',[r,g,b]);
+        actor.Meta.label = Weight;
+        actor.changeName([t.fileID{i}])
+    end
+    
 end
 end
-

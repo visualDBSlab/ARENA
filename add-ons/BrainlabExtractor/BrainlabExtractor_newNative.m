@@ -5,17 +5,27 @@ referencePath = fullfile(mainPath,'RefAnatomy'); %reference anatomy
 warpPath = fullfile(mainPath,'Warp');  %for saving transformation matrix
 
 %ask for input structure
-waitfor(msgbox('Find the NATIVE atlas file'))
-[filename,pathname] = uigetfile('*','Get the folder with nii files');
+meshes = ArenaScene.getActorsOfClass(scene,'Mesh');
+options = {meshes.Tag, 'Browse...'};
+selection = listdlg('ListString',options,'ListSize',[400,300]);
 
-%load input
-[native_V, native_F] = load_obj(fullfile(pathname,filename));
+if selection==numel(meshes)+1
+    [filename,pathname] = uigetfile('*','Get the folder with the mesh');
+
+    %load input
+    [native_V, native_F] = load_obj(fullfile(pathname,filename));
+else
+    filename = meshes(selection).Tag;
+    native_V = meshes(selection).Data.Vertices;
+    native_F = meshes(selection).Data.Faces;
+end
 
 %ask description of input
 options = {'STN left','STN right','GPi left','GPi right'};
 [indx] = listdlg('PromptString',{['What is ',filename,'?']},...
     'SelectionMode','single','ListString',...
-    options);
+    options,...
+    'ListSize',[400,100]);
 anatomy = options{indx};
 
 %load MNI reference

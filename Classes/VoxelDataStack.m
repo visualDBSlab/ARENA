@@ -15,6 +15,7 @@ classdef VoxelDataStack < handle
         SparseOptimization = true;
         BinarizeData=false;
         Electrodes = Electrode.empty;
+        Tag
         
         
     end
@@ -704,7 +705,11 @@ classdef VoxelDataStack < handle
                         printwhendone{end+1} = ['not_mirrored: ',obj.Recipe.fullpath{i}];
                     end
                     obj.InsertVoxelDataAt(vd,i);
-                    obj.InsertElectrodeAt(e,insertAt)
+                    if exist('e')
+                        if not(isnan(e))
+                            obj.InsertElectrodeAt(e,insertAt)
+                        end
+                    end
                     id = obj.Recipe.fileID(i);
                 end
                 
@@ -822,6 +827,8 @@ classdef VoxelDataStack < handle
         
         function obj = insertFull(obj,v,i,varargin)
             if isempty(varargin)
+                depth = 1;
+            elseif isempty(varargin{1})
                 depth = 1;
             else
                 depth = varargin{1}{1};
