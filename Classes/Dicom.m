@@ -21,6 +21,7 @@ classdef Dicom < handle
         Segmentation =0
         Dicomdir
         InstanceNumbers
+        Parent
 
     end
 
@@ -56,8 +57,12 @@ classdef Dicom < handle
                             obj.T = inv(...
                                 [obj.raw_Info.ImageOrientationPatient(1:3),...
                                 obj.raw_Info.ImageOrientationPatient(4:6),...
-                                cross(obj.raw_Info.ImageOrientationPatient(1:3),...
-                                obj.raw_Info.ImageOrientationPatient(4:6))]);
+                                cross(obj.raw_Info.ImageOrientationPatient(4:6),...
+                                obj.raw_Info.ImageOrientationPatient(1:3))]);
+                                
+                                %original:
+                                %cross(obj.raw_Info.ImageOrientationPatient(1:3),...
+                                %obj.raw_Info.ImageOrientationPatient(4:6))]);
                             obj.T(4,4)=1;
                         catch
                             obj.T = nan;
@@ -125,12 +130,14 @@ classdef Dicom < handle
             end
 
             function [fg,bg] = detectForeground(volumes)
-                % totalvalues = cellfun(@total,volumes);
-                % [~,bg_index] = min(totalvalues);
-                % [~,fg_index] = max(totalvalues);
-                %Hard coded because I assume brainlab is consistent
-                fg = volumes{2};
-                bg = volumes{1};
+                totalvalues = cellfun(@total,volumes);
+                [~,bg_index] = min(totalvalues);
+                [~,fg_index] = max(totalvalues);
+                fg = volumes{fg_index};
+                bg = volumes{bg_index};
+                %Not longer hard coded because brainlab is inconsistent
+                %fg = volumes{2};
+                %bg = volumes{1};
 
             end
 
