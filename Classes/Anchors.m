@@ -55,6 +55,11 @@ classdef Anchors < handle
                     obj.v3D(obj.n,:) = actor.Anchor.getArray';
                     obj.color(obj.n,:) = actor.Visualisation.settings.colorFace;
                     obj.label{obj.n} = actor.Tag;
+                case 'Electrode'
+                    obj.n = obj.n+1;
+                    obj.v3D(obj.n,:) = actor.Anchor.getArray';
+                    obj.color(obj.n,:) = actor.Visualisation.settings.colorBase;
+                    obj.label{obj.n} = actor.Tag;
             end
                    
         end
@@ -122,7 +127,7 @@ classdef Anchors < handle
             obj.handle.line.Color = obj.color(indx,:);
 
             obj.handle.txt.Position = Cursor3D;
-            obj.handle.txt.String = obj.label{indx};
+            obj.handle.txt.String = ['   ',obj.label{indx}];
             obj.handle.txt.BackgroundColor = obj.color(indx,:);
   
 

@@ -381,7 +381,8 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.presets.main = uimenu(obj.handles.menu.dynamic.main ,'Text','Presets');
             
 
-            obj.handles.menu.dynamic.Slicei.cluster = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [GPiPD_spots]','callback',{@menu_extractClusters1},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.cluster1 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [GPiPD_spots]','callback',{@menu_extractClusters1},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.cluster2 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [StimInduced Bradykinesia]','callback',{@menu_extractClusters2},'Enable','off');
             obj.handles.menu.dynamic.ObjFile.obj2mesh = uimenu(obj.handles.menu.dynamic.generate.main,'Text','ObjFile: convert to Mesh','callback',{@menu_obj2mesh},'Enable','off');
             
             
@@ -935,10 +936,10 @@ classdef ArenaScene < handle
                     thisCOG.changeSetting('colorLow',thisActor.Visualisation.settings.colorFace)
 
                     disp('MNI coordinates (mm) Right/Anterior/Superior:')
-                    thisCOG.Data.Vectors
+                    thisCOG.Data.Vectors.disp()
 
                     disp('ACPC coordinates (mm) Right/Anterior/Superior:')
-                    A_MNI2ACPC(thisCOG.Data.Vectors)
+                    A_MNI2ACPC(thisCOG.Data.Vectors).disp()
                     
                 end
                 
@@ -985,20 +986,47 @@ classdef ArenaScene < handle
                             new_actor.changeName(['[HIGH]',num2str(sizelist(iCluster)),'voxels - based on: ',actor.Tag]);
                         end
                     end
-                   
-                   
 
-
-
-
-
-
-                    
-                    
-                    
                 end
             end
-            
+
+            function menu_extractClusters2(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+
+                %--- Presets
+                SMOOTHITERATIONS = 2;
+                POSITIVE_THRESHOLD = 0.5;
+                NEGATIVE_THRESHOLD = -0.5;
+
+               
+                disp('### Clustering presets for [GPiPD_spots] ###')
+                
+                for iActor = 1:numel(currentActors)
+                    actor = currentActors(iActor);
+                    vd = currentActors(iActor).Data.parent.copy(); %copy to make sure smoothing operations do not overwrite source data
+
+                    disp(['Smoothing with kernel size: ',num2str(3)])
+                    for i = 1:SMOOTHITERATIONS
+                        vd.smooth()
+                    end
+
+                    disp(['Thresholding <',num2str(NEGATIVE_THRESHOLD)])
+                    new_actor = vd.getmesh(NEGATIVE_THRESHOLD).see(scene);
+                    new_actor.changeName(['[LOW] - based on: ',actor.Tag]);
+
+                    disp(['Thresholding >',num2str(POSITIVE_THRESHOLD)])
+                    new_actor = vd.getmesh(POSITIVE_THRESHOLD).see(scene);
+                    new_actor.changeName(['[HIGH] - based on: ',actor.Tag]);
+
+              
+                  
+
+               
+
+                end
+
+            end
             function menu_moveTransformationMatrix(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
@@ -4624,6 +4652,15 @@ classdef ArenaScene < handle
                             if not(isempty(thisActor.Data.Source))
                                 vd = thisActor.Data.Source;
                                 vd_bin = vd.makeBinary(thisActor.Data.Settings.T);
+                                switch class(vd_bin)
+                                    case 'CroppedVoxelData'
+                                        Voxels = vd_bin.Voxels;
+                                        R = vd_bin.R;
+                                        vd_bin = VoxelData(Voxels,R);
+                                end
+
+
+
                                 inputdata(end+1) = vd_bin;
                                 labels{end+1} = thisActor.Tag;
                             end

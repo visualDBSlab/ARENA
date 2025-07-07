@@ -78,6 +78,21 @@ classdef PointCloud < ArenaActorRendering
             pointcloud = obj;
             save(fullfile(outdir,tag),'pointcloud')
         end
+
+        function ttest2_CoordinatesAgainstOtherPointCloud(obj,other)
+            a = obj.Vectors.getArray();
+            b = other.Vectors.getArray();
+            
+            for d = 1:3
+                [h,p,ci,stats] = ttest2(a(:,d),b(:,d));
+                disp(['Dimension ',num2str(d)])
+                disp('------------')
+                disp(['Reject null hypothesis: ',num2str(h)])
+                disp(['p: ',num2str(p)])
+                disp(['t:', num2str(stats.tstat)])
+                
+            end
+        end
         
         
 

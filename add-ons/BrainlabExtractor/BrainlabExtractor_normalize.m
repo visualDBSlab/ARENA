@@ -7,6 +7,10 @@ function BrainlabExtractor_normalize(menu,eventdata,scene)
 nativeTemplate = menu.Parent.UserData.master;
 BIfilename = menu.Parent.UserData.BIfilename;
 BIfoldername = menu.Parent.UserData.BIfoldername;
+
+Otherfilename = menu.Parent.UserData.Otherfilename;
+Otherfoldername = menu.Parent.UserData.Otherfoldername;
+
 %%% in the future , add a line here, if BIfoldername is empty use native template folder 
 CTfilename = menu.Parent.UserData.CTfilename;
 CTfoldername = menu.Parent.UserData.CTfoldername;

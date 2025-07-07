@@ -46,6 +46,30 @@ classdef Vector3D
                 end
             end
         end
+
+        function disp(obj)
+            if obj.x<0
+                x_ = '';
+            else
+                x_ = ' ';
+            end
+
+            if obj.y<0
+                y_ = '';
+            else
+                y_ = ' ';
+            end
+
+            if obj.z<0
+                z_= '';
+            else
+                z_ = ' ';
+            end
+            disp(['    x: ',x_,num2str(round(obj.x,1))])
+            disp(['    y: ',y_,num2str(round(obj.y,1))])
+            disp(['    z: ',z_,num2str(round(obj.z,1))])
+
+        end
         
         function out = unit(obj)
             if length(obj) ==1

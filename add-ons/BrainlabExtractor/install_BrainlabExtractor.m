@@ -1,7 +1,8 @@
 function install_BrainlabExtractor(menuhandle,eventdata,scene)
 
 scene.addon_addmenuitem('BrainlabExtractor','Master: [none]',str2func('@BrainlabExtractor_AssignMaster'))
-scene.addon_addmenuitem('BrainlabExtractor','burned-in: [none]',str2func('@BrainlabExtractor_AssignBI'))
+scene.addon_addmenuitem('BrainlabExtractor','Burned-in: [none]',str2func('@BrainlabExtractor_AssignBI'))
+scene.addon_addmenuitem('BrainlabExtractor','Other: [none]',str2func('@BrainlabExtractor_AssignOther'))
 scene.addon_addmenuitem('BrainlabExtractor','Electrodes by coordinates: [none]',str2func('@BrainlabExtractor_DefineElectrodes'))
 scene.addon_addmenuitem('BrainlabExtractor','post-op CT: [none]',str2func('@BrainlabExtractor_CT'))
 scene.addon_addmenuitem('BrainlabExtractor','run batch call',str2func('@Batch_Brainlab'))
@@ -14,6 +15,12 @@ scene.addon_addmenuitem('BrainlabExtractor','Import elecrtrodes from Excel (no n
 %-----
 sephere2 = scene.addon_addmenuitem('BrainlabExtractor','Normative to native', str2func('@BrainlabExtractor_updateNativeMenu'));
 scene.addon_addmenuitem('BrainlabExtractor','+ new native link',str2func('@BrainlabExtractor_newNative'),sephere2)
+dcmdirmenu = scene.addon_addmenuitem('BrainlabExtractor','DICOMDIR', str2func('@BrainlabExtractor_updateDICOMDIRMenu'));
+scene.addon_addmenuitem('BrainlabExtractor','+ new DICOMDIR',str2func('@BrainlabExtractor_newDICOMDIR'),dcmdirmenu)
+%---
+sephere3 = scene.addon_addmenuitem('BrainlabExtractor','Preprocessing');
+scene.addon_addmenuitem('BrainlabExtractor','Reconnect nii to header',str2func('@BrainlabExtractor_reconnectToHeader'),sephere3)
+
 
 
 %add separator
