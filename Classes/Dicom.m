@@ -54,15 +54,25 @@ classdef Dicom < handle
                             obj.Type = '';
                         end
                         try
+                            %This needs to be figured out properly.
+                            %Sometimes the Z is Y*X, sometimes the Z is
+                            %X*Y.
+
+                            if  contains(obj.raw_Info.RequestedProcedureDescription,'CT')
+                                %RAS:
+                                obj.T = inv(...
+                                [obj.raw_Info.ImageOrientationPatient(1:3),...
+                                obj.raw_Info.ImageOrientationPatient(4:6),...
+                                cross(obj.raw_Info.ImageOrientationPatient(1:3),...
+                                obj.raw_Info.ImageOrientationPatient(4:6))]);
+                            else
+
                             obj.T = inv(...
                                 [obj.raw_Info.ImageOrientationPatient(1:3),...
                                 obj.raw_Info.ImageOrientationPatient(4:6),...
                                 cross(obj.raw_Info.ImageOrientationPatient(4:6),...
                                 obj.raw_Info.ImageOrientationPatient(1:3))]);
-                                
-                                %original:
-                                %cross(obj.raw_Info.ImageOrientationPatient(1:3),...
-                                %obj.raw_Info.ImageOrientationPatient(4:6))]);
+                            end
                             obj.T(4,4)=1;
                         catch
                             obj.T = nan;
@@ -147,7 +157,9 @@ classdef Dicom < handle
         end
 
         function warpToRAS(obj)
-            obj.TtoRAS = obj.T * diag([-1 -1 1 1]);
+            [~,Tvoxelsize] = obj.getVoxelSize();
+
+            obj.TtoRAS = obj.T * diag([-1 -1 1 1]*Tvoxelsize);
 
                 if not(isempty(obj.VoxelData))
                     obj.RAS_VoxelData = obj.VoxelData.imwarp(obj.TtoRAS);
@@ -178,6 +190,22 @@ classdef Dicom < handle
         function overwriteWith(obj,vd)
             obj.RAS_VoxelData = vd.warpto(obj.RAS_VoxelData);
            
+        end
+
+        function [voxelsize,Tvoxelsize] = getVoxelSize(obj)
+            if not(isempty(obj.Parent))
+                info = obj.Dicomdir.Dicoms(obj.Parent).raw_Info;
+            else
+                info = obj.raw_Info;
+            end
+
+            x = info.PixelSpacing(1);
+            y = info.PixelSpacing(2);
+            z = info.SliceThickness;
+            
+            voxelsize = [x,y,z]; %ASSUMING X, Y And Z are correct..
+            Tvoxelsize = diag([voxelsize,1]);
+            
         end
 
 
