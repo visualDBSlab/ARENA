@@ -133,6 +133,7 @@ classdef HeatmapModelSupport < handle
                     leadname = filename;
                     return
                 catch
+                    leadname = '[leadname]';
                     %try smth else
                 end
             end
