@@ -35,6 +35,25 @@ classdef Dicom < handle
 
         end
 
+        function bool = isCT(obj)
+            fns = fieldnames(obj.raw_Info);
+            for i  = 1:numel(fns)
+                fn = fns{i};
+                value = obj.raw_Info.(fn);
+                if ischar(value)
+                    if contains(value,'CT')
+                        bool = true;
+                        return 
+                    end
+                end
+            end
+            bool = false;
+        end
+            
+
+
+        
+
         function recordSequence(obj,rec)
             switch rec.DirectoryRecordType
                 case 'SERIES'
@@ -58,7 +77,9 @@ classdef Dicom < handle
                             %Sometimes the Z is Y*X, sometimes the Z is
                             %X*Y.
 
-                            if  contains(obj.raw_Info.RequestedProcedureDescription,'CT')
+                            
+
+                            if  obj.isCT()
                                 %RAS:
                                 obj.T = inv(...
                                 [obj.raw_Info.ImageOrientationPatient(1:3),...
@@ -66,12 +87,11 @@ classdef Dicom < handle
                                 cross(obj.raw_Info.ImageOrientationPatient(1:3),...
                                 obj.raw_Info.ImageOrientationPatient(4:6))]);
                             else
-
-                            obj.T = inv(...
-                                [obj.raw_Info.ImageOrientationPatient(1:3),...
-                                obj.raw_Info.ImageOrientationPatient(4:6),...
-                                cross(obj.raw_Info.ImageOrientationPatient(4:6),...
-                                obj.raw_Info.ImageOrientationPatient(1:3))]);
+                                obj.T = inv(...
+                                    [obj.raw_Info.ImageOrientationPatient(1:3),...
+                                    obj.raw_Info.ImageOrientationPatient(4:6),...
+                                    cross(obj.raw_Info.ImageOrientationPatient(4:6),...
+                                    obj.raw_Info.ImageOrientationPatient(1:3))]);
                             end
                             obj.T(4,4)=1;
                         catch
