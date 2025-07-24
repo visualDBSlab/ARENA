@@ -65,9 +65,10 @@ classdef Vector3D
             else
                 z_ = ' ';
             end
-            disp(['    x: ',x_,num2str(round(obj.x,1))])
-            disp(['    y: ',y_,num2str(round(obj.y,1))])
-            disp(['    z: ',z_,num2str(round(obj.z,1))])
+            disp(['    x: ',x_,num2str(round(obj.x,2))])
+            disp(['    y: ',y_,num2str(round(obj.y,2))])
+            disp(['    z: ',z_,num2str(round(obj.z,2))])
+            
 
         end
         

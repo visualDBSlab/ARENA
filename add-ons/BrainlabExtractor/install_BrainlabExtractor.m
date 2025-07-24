@@ -20,6 +20,7 @@ scene.addon_addmenuitem('BrainlabExtractor','+ new DICOMDIR',str2func('@Brainlab
 %---
 sephere3 = scene.addon_addmenuitem('BrainlabExtractor','Preprocessing');
 scene.addon_addmenuitem('BrainlabExtractor','Reconnect nii to header',str2func('@BrainlabExtractor_reconnectToHeader'),sephere3)
+scene.addon_addmenuitem('BrainlabExtractor','Cut out a box around the electrodes',str2func('@BrainlabExtractor_saveBoxAroundElectrodes'))
 
 
 

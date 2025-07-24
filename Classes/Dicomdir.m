@@ -51,6 +51,8 @@ classdef Dicomdir < handle
             obj.segmentAll();
             obj.getTforAll();
             obj.warpAllToRAS();
+            obj.setContrast();
+            obj.setCorner();
         end
 
         function clean(obj)
@@ -63,6 +65,22 @@ classdef Dicomdir < handle
                 end
             end
             obj.Dicoms(not(keep)) = [];
+        end
+
+        function setContrast(obj)
+            for D = obj.Dicoms
+                if D.isCT
+                    D.RAS_VoxelData.setContrast(D.raw_Info.RescaleSlope,D.raw_Info.RescaleIntercept)
+                end
+            end
+        end
+
+        function setCorner(obj)
+            for D = obj.Dicoms
+                if not(isinf(D.raw_corner.x))
+                    D.RAS_VoxelData.setCorner(D.raw_corner)
+                end
+            end
         end
 
         function segmentAll(obj)

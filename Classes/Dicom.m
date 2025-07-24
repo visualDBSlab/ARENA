@@ -7,6 +7,7 @@ classdef Dicom < handle
         raw_Files = {}
         raw_InstanceNumbers = []
         raw_class = '';
+        raw_corner = Vector3D(inf,inf,inf)
         T
         TtoRAS
         Tag
@@ -65,6 +66,17 @@ classdef Dicom < handle
                     fullFilePath = fullfile(fileparts(obj.Dicomdir.Info.Filename), referencedFile);
                     obj.raw_Files{end+1} = fullFilePath;
                     obj.raw_InstanceNumbers(end+1) = rec.InstanceNumber;
+                    
+                    if or(and(numel(obj.raw_Files)>1,not(isinf(obj.raw_corner.x))),numel(obj.raw_Files)==1)
+                        info = dicominfo(obj.raw_Files{end});
+                        if isfield(info,'ImagePositionPatient')
+                            slicecorner = info.ImagePositionPatient;
+                            obj.raw_corner.x = min([obj.raw_corner.x, slicecorner(1)]);
+                            obj.raw_corner.y = min([obj.raw_corner.y, slicecorner(2)]); 
+                            obj.raw_corner.z = min([obj.raw_corner.z, slicecorner(3)]);
+                        end
+                    end
+
                     if isempty(obj.raw_Info)
                         obj.raw_Info = dicominfo(obj.raw_Files{end});
                         try

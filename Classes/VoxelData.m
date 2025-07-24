@@ -268,10 +268,12 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
                 rightup = Vector3D(rightup);
             end
 
-
+            X = obj.R.XWorldLimits;
+            Y = obj.R.YWorldLimits;
+            Z = obj.R.ZWorldLimits;
             %get the voxelindices at boundingbox edges
-            [ldy,ldx,ldz] = obj.R.worldToSubscript(min([leftdown.x,rightup.x]),min([leftdown.y,rightup.y]),min([leftdown.z,rightup.z]));
-            [ruy,rux,ruz] = obj.R.worldToSubscript(max([leftdown.x,rightup.x]),max([leftdown.y,rightup.y]),max([leftdown.z,rightup.z]));
+            [ldy,ldx,ldz] = obj.R.worldToSubscript(max([leftdown.x,X(1)]),max([leftdown.y,Y(1)]),max([leftdown.z,Z(1)]));
+            [ruy,rux,ruz] = obj.R.worldToSubscript(min([rightup.x,X(2)]),min([rightup.y,Y(2)]),min([rightup.z,Z(2)]));
 
             %crop voxels
             v  = obj.Voxels(ldy:ruy,ldx:rux,ldz:ruz);
@@ -474,6 +476,21 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
 
         end
 
+        function out = setContrast(obj,slope,intercept)
+            if nargout==1
+                out = VoxelData((o1.Voxels*slope)+intercept,obj.R);
+            else
+                obj.Voxels = (obj.Voxels*slope)+intercept;
+            end
+        end
+
+        function obj = setCorner(obj,corner)
+            current_corner = [obj.R.XWorldLimits(1),obj.R.YWneworldLimits(1),obj.R.ZWorldLimits(1)];
+            delta =corner-Vector3D(current_corner);
+            obj.move(delta)
+            
+        end
+
         function showprojection(o1,view)
 
             [i,j,k] = o1.R.worldToIntrinsic(0,0,0);
@@ -656,7 +673,7 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
             end
 
         end
-
+        
 
         function o3 = minus(o1,o2)
             img1 = o1.Voxels;
