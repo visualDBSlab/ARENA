@@ -29,9 +29,21 @@ classdef Mesh < handle & matlab.mixin.Copyable & ArenaActorRendering
                         obj.Source = [];
                         obj.Settings = [];
                 end
-            end
+        end
+
         
-        
+        function T = getTriangulation(obj)
+            T = triangulation(obj.Faces,obj.Vertices);
+        end
+
+        function normals = getVertexNormals(obj)
+            normals =VectorCloud(obj.Vertices,obj.getTriangulation().vertexNormal);
+        end
+
+        function stlwrite(obj,filename)
+            stlwrite(obj.getTriangulation,filename)
+        end
+
         function obj = getmeshfromvoxeldata(obj,varargin)
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
