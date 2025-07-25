@@ -485,7 +485,7 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
         end
 
         function obj = setCorner(obj,corner)
-            current_corner = [obj.R.XWorldLimits(1),obj.R.YWneworldLimits(1),obj.R.ZWorldLimits(1)];
+            current_corner = [obj.R.XWorldLimits(1),obj.R.YWorldLimits(1),obj.R.ZWorldLimits(1)];
             delta =corner-Vector3D(current_corner);
             obj.move(delta)
             
