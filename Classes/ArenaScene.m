@@ -4,7 +4,7 @@ classdef ArenaScene < handle
     %   You can open a scene with:
     %   -   myScene = newScene();
     %   -   or startArena;
-    %
+    % 
     %   See also ARENAACTOR
     
     properties
@@ -336,6 +336,8 @@ classdef ArenaScene < handle
             obj.handles.menu.edit.analysis.main = uimenu(obj.handles.menu.edit.main,'Text','Analyse selection');
             obj.handles.menu.edit.meta.main = uimenu(obj.handles.menu.edit.main,'Text','meta tags');
             obj.handles.menu.edit.meta.submenus = gobjects;%empty submenus
+
+             obj.handles.menu.drawbox.main = uimenu(obj.handles.menu.edit.main,'Text','drawBox','callback',{@menu_drawbox});
             
             
             obj.handles.menu.edit.analysis.sampleheatmap = uimenu(obj.handles.menu.edit.analysis.main,'Text','sample selection with ... ','callback',{@menu_sampleHeatmap});
@@ -369,6 +371,10 @@ classdef ArenaScene < handle
             obj.handles.menu.transform.selectedlayer.move =  uimenu(obj.handles.menu.transform.selectedlayer.simple.main,'Text','Move','callback',{@menu_move});
             obj.handles.menu.transform.selectedlayer.transformationmatrix =  uimenu(obj.handles.menu.transform.selectedlayer.simple.main,'Text','Transformation matrix from workspace','callback',{@menu_moveTransformationMatrix});
             
+
+           
+
+
             obj.handles.menu.addons.main = uimenu(obj.handles.figure,'Text','Add-ons');
             menu_refreshAddOnsList(obj,[],'startup');
             
@@ -793,6 +799,7 @@ classdef ArenaScene < handle
                 %get electrodes
                 scene = ArenaScene.getscenedata(hObject);
                 arrayfun(@(x) delete(x), obj.handles.menu.view.camera.surgical.electrodes);
+                
                 currentActors = ArenaScene.getSelectedActors(scene);
                 [actorlist,namelist,indexlist] =  ArenaScene.getActorsOfClass(scene,'Electrode');
                 
@@ -2889,7 +2896,7 @@ classdef ArenaScene < handle
                     thisActor = currentActors(iActor);
                     
                     vd = thisActor.Data.parent;
-                    Voxels = vd.Voxels;
+                    Voxels = vd.smooth().Voxels;
                     
                     skull = Voxels > 700;
                     cables = Voxels > 1800;
@@ -2898,6 +2905,9 @@ classdef ArenaScene < handle
                     indxskull = find(skull);
                     [x,y,z] = ind2sub(size(skull),indxskull);
                     cog_head_imagespace = [mean(x),mean(y),mean(z)];
+
+                    %shift center down towards midbrain
+                    cog_head_imagespace(3) = cog_head_imagespace(3) - 30/vd.R.PixelExtentInWorldZ;
                     
                     %get tips in image space
                     skeleton = bwskel(cables);
@@ -4584,6 +4594,14 @@ classdef ArenaScene < handle
                 %take vertices
                 %apply PCA
                 %get the deepest point.
+                distance = norm(electrode{1}-electrode{2});
+                disp(['The distance between the two assumed contacts is: ',num2str(distance)])
+                disp('If you expected this distance to be 6mm (eg MDT3389), you can shift the electrode to average out these errors by:')
+                correction = (distance-6)/2;
+                disp(round(correction,1))
+                disp('Go to Edit > Transform > In electrode space > change the Z with the number above')
+
+
                 
             end
             
@@ -4879,6 +4897,27 @@ classdef ArenaScene < handle
                 
             end
             
+            function menu_drawbox(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor)
+                    box = [thisActor.Data.parent.R.XWorldLimits;...
+                        thisActor.Data.parent.R.YWorldLimits;...
+                        thisActor.Data.parent.R.ZWorldLimits];
+
+                    pc = PointCloud();
+                    for x = [1,2]
+                        for y = [1,2]b
+                            for z = [1,2]
+                                pc.addVectors(Vector3D(box(1,x),box(2,y),box(3,z)))
+                            end
+                        end
+                    end
+                    pc.see(scene)
+                end
+
+            end
             
             function menu_getinfo(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
@@ -5445,6 +5484,9 @@ classdef ArenaScene < handle
             
             
             ActorTags = {};
+            if isempty(obj)
+                return
+            end
             for i = 1:numel(obj.Actors)
                 try
                     properties = fieldnames(obj.Actors(i).Visualisation.settings);

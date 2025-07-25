@@ -52,7 +52,7 @@ classdef Dicomdir < handle
             obj.getTforAll();
             obj.warpAllToRAS();
             obj.setContrast();
-            obj.setCorner();
+            %obj.setCorner(); 
         end
 
         function clean(obj)
