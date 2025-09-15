@@ -73,6 +73,31 @@ classdef Electrode < handle & matlab.mixin.Copyable & ArenaActorRendering
             e = obj;
             save(fullfile(outputfolder,[tag,'.electrode']),'e')
         end
+
+        function saveToFolderAsJSON(obj,outputfolder)
+            s = struct(obj);
+            s.C0 = struct(s.C0);
+            s.C0 = rmfield(s.C0,'description');
+            
+            s.Direction = struct(s.Direction);
+            s.Direction = rmfield(s.Direction,'description');
+            
+            s = rmfield(s,'VTA');
+            s = rmfield(s,'MATERIAL_Electrode_body');
+            s = rmfield(s,'MATERIAL_Electrode_contact');
+            s = rmfield(s,'MATERIAL_Fiber');
+            s = rmfield(s,'MATERIAL_Mesh');
+            s = rmfield(s,'MATERIAL_ObjFile');
+            s = rmfield(s,'MATERIAL_Slicei');
+
+
+            txt = jsonencode(s,"PrettyPrint",true);
+
+            fid = fopen(outputfolder,'wt+');
+            fprintf(fid, txt); 
+            fclose(fid);
+
+        end
         
         function [thisActor,thisScene] = see(obj, sceneobj)
             global arena

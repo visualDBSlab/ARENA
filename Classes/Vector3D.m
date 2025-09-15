@@ -48,6 +48,11 @@ classdef Vector3D
         end
 
         function disp(obj)
+            if numel(obj)>1
+                disp(sprintf('\tx \ty \tz'))
+                disp(obj.getArray())
+                return
+            end
             if obj.x<0
                 x_ = '';
             else

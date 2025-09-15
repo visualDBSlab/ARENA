@@ -591,7 +591,7 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
             [X,Y,Z] = obj.getMeshgrid();
 
             if isa(coordinate,'Vector3D')
-                value = interp3(X,Y,Z,obj.Voxels,coordinate.x,coordinate.y,coordinate.z);
+                value = interp3(X,Y,Z,obj.Voxels,[coordinate.x],[coordinate.y],[coordinate.z]);
             elseif isa(coordinate,'PointCloud')
                 value = [];
 
@@ -624,6 +624,30 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
             else
                 out_obj = upsampled;
             end
+        end
+
+        function obj = scaleByFactor(obj,factor)
+            currently = [obj.R.PixelExtentInWorldX,obj.R.PixelExtentInWorldY,obj.R.PixelExtentInWorldZ];
+            newvoxelsize = currently*factor;
+            disp(['Changing voxelsize from: ',num2str(currently),' to: ',num2str(newvoxelsize)])
+
+            originalCenter = obj.getCenter();
+
+            obj.R = imref3d(obj.R.ImageSize,...
+                newvoxelsize(1),...
+                newvoxelsize(2),...
+                newvoxelsize(3));
+
+            tempCenter = obj.getCenter();
+            correction = tempCenter-originalCenter;
+            obj.R.XWorldLimits = obj.R.XWorldLimits-correction.x;
+            obj.R.YWorldLimits = obj.R.YWorldLimits-correction.y;
+            obj.R.ZWorldLimits = obj.R.ZWorldLimits-correction.z;
+
+
+
+
+
         end
 
 

@@ -5,10 +5,14 @@ load('NoodlesConfig.mat')
 uiwait(msgbox('Please select your fibers. Tip: Add them to the ''Fibers'' folder in Arena Noodles for a quick workflow'))
 [files,folder] = uigetfile('*','MultiSelect','on','defname','Fibers');
 
+if ischar(files)
+    files = {files};
+end
 if numel(files)
     NoodlesConfig.fibers = files;
     NoodlesConfig.fibersfolder = folder;
-    set(NoodlesConfig.handles.fibers,'Text',['Fibers: ',num2str(numel(files)),' selected'],'Checked','on')
+    set(NoodlesConfig.handles.fibersbasic,'Text',['Fibers: ',num2str(numel(files)),' selected'],'Checked','on')
+    set(NoodlesConfig.handles.fibersrecipe,'Text',['Fibers: ',num2str(numel(files)),' selected'],'Checked','on')
 end
 
 
