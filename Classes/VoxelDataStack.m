@@ -465,9 +465,7 @@ classdef VoxelDataStack < handle
                 obj.RecipePath=fullfile(foldername,filename);
             end
             
-           %Data allocation
-           disp('Allocating disk space')
-            obj.Voxels  = zeros(prod(obj.R.ImageSize),height(recipe),2);
+           
             
             if nargin==2 %--> no templatefile is provided
                 if isempty(obj.R)
@@ -486,6 +484,10 @@ classdef VoxelDataStack < handle
                     end
                 end
             end
+
+            %Data allocation
+           disp('Allocating disk space')
+            obj.Voxels  = zeros(prod(obj.R.ImageSize),height(recipe),2);
             
             if nargin==3
                 obj.R = VoxelData(templatefile).R;

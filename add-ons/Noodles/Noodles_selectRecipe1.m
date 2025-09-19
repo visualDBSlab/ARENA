@@ -2,14 +2,13 @@ function [outputArg1,outputArg2] = Noodles_selectRecipe1(menu,eventdata,scene)
 
 load('NoodlesConfig.mat')
 
-Stack=VoxelDataStack;
-Stack.construct();
-nPatients = numel(Stack.Weights);
+[file,path] = uigetfile({'*.xls','*.xlsx'});
 
 
-if nPatients
-    NoodlesConfig.Recipe1 = Stack;
-    set(NoodlesConfig.handles.recipe1,'Text',['Recipe: loaded (',num2str(nPatients),')'],'Checked','on')
+
+if file
+    NoodlesConfig.Recipe1 = fullfile(path,file);
+    set(NoodlesConfig.handles.recipe1,'Text',['Recipe: loaded (',file,')'],'Checked','on')
 end
 
 

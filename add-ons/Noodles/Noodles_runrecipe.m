@@ -21,6 +21,14 @@ function [outputArg1,outputArg2] = Noodles_runbasic(menu,eventdata,scene)
         end
         fibers{iFiber}=f;
     end
+
+    %Load VoxelDataStack
+    rcp1 = NoodlesConfig.Recipe1;
+    rcp2 = NoodlesConfig.Recipe2;
+ 
+    NoodlesConfig.Recipe1 = VoxelDataStack().loadStudyDataFromRecipe(rcp1);
+    NoodlesConfig.Recipe2 = VoxelDataStack().loadStudyDataFromRecipe(rcp2);
+
     
 
 %initialize data tree (each fiberbundle might have different N)
