@@ -16,6 +16,9 @@ function [outputArg1,outputArg2] = Noodles_runbasic(menu,eventdata,scene)
             case '.vtk'
                 fname = fullfile(NoodlesConfig.fibersfolder,NoodlesConfig.fibers{iFiber});
                 f.loadvtk(fname)
+            case '.mat'
+                fname = fullfile(NoodlesConfig.fibersfolder,NoodlesConfig.fibers{iFiber});
+                f.loadleadDBSfibers(fname)
             otherwise
                 error('Fiber file extension not yet supported.')
         end

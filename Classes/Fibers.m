@@ -348,6 +348,32 @@ classdef Fibers < handle & matlab.mixin.Copyable & ArenaActorRendering
             end
         
         end
+
+        function loadleadDBSfibers(obj,filename)
+                loaded = load(filename);
+                if isfield(loaded,'fibcell')
+                    version = 2;
+                else
+                    version = 1;
+                end
+                
+                
+                switch version
+                    case 2
+                       warning('not yet supported')
+                    case 1
+                        
+                        startIndex = [0;cumsum(loaded.idx)];
+                        for iFib = 1:numel(startIndex)-1
+                            if loaded.idx(iFib)>1
+                                obj.addFiber(loaded.fibers(startIndex(iFib)+1:startIndex(iFib+1),1:3),iFib)
+                            end
+                        end
+                      
+                end
+                
+                
+            end
         
         function [pc,indcs] = serialize(obj)
             pc = PointCloud;
