@@ -384,6 +384,17 @@ classdef Fibers < handle & matlab.mixin.Copyable & ArenaActorRendering
             end
             
         end
+
+        function out = deserializeValues(obj,values,indcs)
+            nFibers = numel(indcs);
+            out = cell(1,nFibers-1);
+            for i = 1:nFibers
+                if i<nFibers
+                    out{i}= values(indcs(i):indcs(i+1)-1);
+                end
+            end
+            
+        end
             
      
     end
