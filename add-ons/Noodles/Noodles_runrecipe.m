@@ -1,9 +1,11 @@
-function [outputArg1,outputArg2] = Noodles_runbasic(menu,eventdata,scene)
+function [outputArg1,outputArg2] = Noodles_runrecipe(menu,eventdata,scene)
 %NOODLES_RUNBASIC() Summary of this function goes here
 %   Detailed explanation goes here
 
 
     fibers = {};
+    output.t []
+    output.p = []
 
     
     load('NoodlesConfig')
@@ -107,13 +109,18 @@ for iFiberBundle = 1:size(sim,2)
             sim{1,iFiberBundle}(:,iString),...
             sim{2,iFiberBundle}(:,iString));
         t = stat.tstat;
-        
+
+        %store data
+        output.t(iFiberBundle) = t;
+        output.p(iFiberBundle) = p;
+
         fibers{iFiberBundle}.Weight(iString) = t;
     end
     fibers{iFiberBundle}.see(scene)
 
 end
 
+    save('output','output')
 end
 
 
