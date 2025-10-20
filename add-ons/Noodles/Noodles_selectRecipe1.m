@@ -2,7 +2,7 @@ function [outputArg1,outputArg2] = Noodles_selectRecipe1(menu,eventdata,scene)
 
 load('NoodlesConfig.mat')
 
-[file,path] = uigetfile({'*.xls','*.xlsx'});
+[file,path] = uigetfile('*.xlsx','Locate the recipe');
 
 
 
