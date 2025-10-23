@@ -108,9 +108,11 @@ for iFiberBundle = 1:size(sim,2)
             sim{2,iFiberBundle}(:,iString));
         t = stat.tstat;
         
-        fibers{iFiberBundle}.Weight(iString) = t;
+      
+        fibers{iFiberBundle}.Weight(iString) = (1-p)*sign(t);
     end
     fibers{iFiberBundle}.see(scene)
+    assignin ('base', 'fibers',fibers)
 
 end
 
