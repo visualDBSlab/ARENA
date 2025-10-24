@@ -13,7 +13,10 @@ scene.addon_addmenuitem('HeatmapMaker','Predict a cohort',str2func('@HeatmapMake
 scene.addon_addmenuitem('HeatmapMaker','Simulate Cross Validation (LOOCV)',str2func('@HeatmapMaker_LOOCV'),prediction)
 
 expert = scene.addon_addmenuitem('HeatmapMaker','Expert pipeline');
-scene.addon_addmenuitem('HeatmapMaker','1. Make a single patient recipe based on electrodes in scene',str2func('@HeatmapMaker_exportLeftRightElectrodeToRecipe'),expert)
+scene.addon_addmenuitem('HeatmapMaker','1a. Make a recipe based on electrodes in scene',str2func('@HeatmapMaker_exportLeftRightElectrodeToRecipe'),expert)
+scene.addon_addmenuitem('HeatmapMaker','1b. Make a recipe based on unilateral hosts',str2func('@HeatmapMaker_exportHostsToRecipe'),expert)
+scene.addon_addmenuitem('HeatmapMaker','1c. Make a recipe based on bilateral hosts',str2func('@HeatmapMaker_exportTherapyToRecipe'),expert)
+
 scene.addon_addmenuitem('HeatmapMaker','2. Predict best settings based on TWO maps',str2func('@HeatmapMaker_monopolarReviewSE'),expert)
 
 

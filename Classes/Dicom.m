@@ -192,6 +192,10 @@ classdef Dicom < handle
             [~,Tvoxelsize] = obj.getVoxelSize();
 
             obj.TtoRAS = obj.T * diag([-1 -1 1 1]*Tvoxelsize);
+            global BrainlabMirror
+            if BrainlabMirror
+                obj.TtoRAS = obj.TtoRAS * diag([-1 1 1 1]);
+            end
 
                 if not(isempty(obj.VoxelData))
                     obj.RAS_VoxelData = obj.VoxelData.imwarp(obj.TtoRAS);
