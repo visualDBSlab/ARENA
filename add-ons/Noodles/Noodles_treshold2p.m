@@ -48,7 +48,7 @@ for iBundle = 1:numel(fibers)
  
      for iFiber = 1:numel (fibers{iBundle}.Indices)
 
-         if (fibers{iBundle}.Weight(1,iFiber))<treshold
+         if abs(fibers{iBundle}.Weight(1,iFiber))>treshold
 
              fibersOut.Vertices(end+1)=fibers{iBundle}.Vertices(1,iFiber);
              fibersOut.Weight(end+1)=fibers{iBundle}.Weight(1,iFiber);

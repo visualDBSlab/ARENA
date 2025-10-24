@@ -21,6 +21,8 @@ NoodlesConfig.handles.fibersrecipe  = scene.addon_addmenuitem('Noodles','Fibers:
 NoodlesConfig.handles.recipe1 = scene.addon_addmenuitem('Noodles','Recipe 1: None selected',str2func('@Noodles_selectRecipe1'),NoodlesConfig.handles.recipemenu);
 NoodlesConfig.handles.recipe2 = scene.addon_addmenuitem('Noodles','Recipe 2: None selected',str2func('@Noodles_selectRecipe2'),NoodlesConfig.handles.recipemenu);
 NoodlesConfig.handles.runrecipe  = scene.addon_addmenuitem('Noodles','Run',str2func('@Noodles_runrecipe'),NoodlesConfig.handles.recipemenu);
+NoodlesConfig.handles.predict  = scene.addon_addmenuitem('Noodles','Predict outcomes with selected bundles',str2func('@Noodles_PredictOutcomes'),NoodlesConfig.handles.recipemenu);
+
 
 %disable run button until data is added
 set(NoodlesConfig.handles.run ,'Enable','off')
