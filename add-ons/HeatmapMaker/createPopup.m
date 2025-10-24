@@ -329,6 +329,7 @@ initiateTable();
         columnnames = {['prediction_',popupdata.model1name],['prediction_',popupdata.model2name],['suggestion_',popupdata.model1name],['suggestion_',popupdata.model2name],'number_of_candidates','number_of_options',['e1_Optimal_contact_',popupdata.model1name],['e1_Optimal_amp_',popupdata.model1name],['e2_Optimal_contact_',popupdata.model1name],['e2_Optimal_amp_',popupdata.model1name],'e1','e2',['best_score_for_1',popupdata.model1name]};
         popupdata.table.Properties.VariableNames = columnnames;
         set(tableHandle,'Data',popupdata.table{:,:},'ColumnName',columnnames)
+        assignin('base','data',popupdata)
         drawnow()
     end
 
