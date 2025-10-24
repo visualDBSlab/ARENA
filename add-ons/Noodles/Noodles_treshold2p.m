@@ -1,0 +1,67 @@
+function [fibersOut] = Noodles_treshold2p (fibers, treshold, correction) %get new bundle of supratreshold fibers
+
+fibersOut = Fibers();
+
+
+if nargin>2
+
+    %% correct for false discovery rate
+
+    if correction == 'FDR'
+
+        Ps = [];
+
+        for iBundle = 1:numel(fibers)
+ 
+            for iFiber = 1:numel (fibers{iBundle}.Indices)
+
+                Ps(end+1)=1-abs(fibers{iBundle}.Weight(iFiber));
+
+            end
+
+        end
+        
+        FDR  = mafdr (Ps); % get FDR
+        k = 0;
+
+        for iBundle = 1:numel(fibers)
+ 
+            for iFiber = 1:numel (fibers{iBundle}.Indices)
+
+               fibers{iBundle}.Weight(iFiber) = (1-FDR (iFiber+k))*sign(fibers{iBundle}.Weight(iFiber)); %assign new corrected signed P
+
+            end
+
+            k=k+iFiber;
+
+        end
+
+
+
+    end
+
+end
+
+%% treshold 
+
+for iBundle = 1:numel(fibers)
+ 
+     for iFiber = 1:numel (fibers{iBundle}.Indices)
+
+         if (fibers{iBundle}.Weight(1,iFiber))<treshold
+
+             fibersOut.Vertices(end+1)=fibers{iBundle}.Vertices(1,iFiber);
+             fibersOut.Weight(end+1)=fibers{iBundle}.Weight(1,iFiber);
+             fibersOut.Indices(end+1)=fibers{iBundle}.Indices(1,iFiber);
+         end
+
+     end
+end
+
+end
+
+
+
+            
+
+   
