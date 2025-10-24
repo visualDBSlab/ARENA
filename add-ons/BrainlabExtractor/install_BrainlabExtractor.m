@@ -21,6 +21,12 @@ scene.addon_addmenuitem('BrainlabExtractor','+ new DICOMDIR',str2func('@Brainlab
 sephere3 = scene.addon_addmenuitem('BrainlabExtractor','Preprocessing');
 scene.addon_addmenuitem('BrainlabExtractor','Reconnect nii to header',str2func('@BrainlabExtractor_reconnectToHeader'),sephere3)
 scene.addon_addmenuitem('BrainlabExtractor','Cut out a box around the electrodes',str2func('@BrainlabExtractor_saveBoxAroundElectrodes'))
+%--
+sephere4 = scene.addon_addmenuitem('BrainlabExtractor','Mirror left/right during import',str2func('@BrainlabExtractor_mirror'));
+
+
+global BrainlabMirror
+BrainlabMirror = true;
 
 
 
@@ -30,6 +36,10 @@ m.Separator = 'on';
 
 m = handle(sephere2);
 m.Separator = 'on';
+
+m = handle(sephere4);
+m.Separator = 'on';
+m.Checked = 'on';
 
 
 %change menu title
