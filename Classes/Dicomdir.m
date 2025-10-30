@@ -44,6 +44,10 @@ classdef Dicomdir < handle
             end
 
             for iD = 1:numel(obj.Dicoms)
+                if isempty(obj.Dicoms(iD).Type)
+                    continue;  % skip to next iD
+                end
+
                 obj.Dicoms(iD).convertRawToVoxelData();
             end
 
