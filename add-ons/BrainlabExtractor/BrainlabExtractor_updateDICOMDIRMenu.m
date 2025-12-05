@@ -20,6 +20,7 @@ for iDD = 1:numel(menu.UserData)
         scene.addon_addmenuitem('BrainlabExtractor','overwrite voxelvalues with selected actor',str2func('@BrainlabExtractor_overwriteDICOM'),parent)
         scene.addon_addmenuitem('BrainlabExtractor','save',str2func('@BrainlabExtractor_saveDicom'),parent)
         scene.addon_addmenuitem('BrainlabExtractor','export to workspace',str2func('@BrainlabExtractor_dicomToWorkspace'),parent)
+        scene.addon_addmenuitem('BrainlabExtractor','save Mesh as STL in this space',str2func('@BrainlabExtractor_exportSTL'),parent)
         
         set(parent,'UserData',D);
     end

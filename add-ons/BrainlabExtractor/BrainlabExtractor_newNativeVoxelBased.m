@@ -1,4 +1,4 @@
-function [outputArg1,outputArg2] = BrainlabExtractor_newNative(menu,eventdata,scene)
+function [outputArg1,outputArg2] = BrainlabExtractor_newNativeVoxelBased(menu,eventdata,scene)
 % 
 mainPath = fileparts(mfilename('fullpath'));
 referencePath = fullfile(mainPath,'RefAnatomy'); %reference anatomy
@@ -145,21 +145,6 @@ function [R, t, s] = compute_similarity_transform(A, B)
     H = AA_scaled' * BB;
     [U,~,V] = svd(H);
     R = V*U';
-    [rx, ry, rz] = rotation_angles_from_matrix(R);
-    if abs(rx)>90
-        R = R * [1 0 0;0 -1 0; 0 0 -1];
-    end
-    if abs(ry)>90
-        R = R * [-1 0 0; 0 1 0; 0 0 -1];
-    end
-    if abs(rz)>90
-        R = R *[-1 0 0;0 -1 0; 0 0 1];
-
-   [rx, ry, rz] = rotation_angles_from_matrix(R);     
-
-  
-
-    end
     if det(R)<0
         V(:,end) = -V(:,end);
         R = V*U';
@@ -227,24 +212,6 @@ function [Vout, Fout] = keep_largest_face_component(V, F)
     Fout = newMap(Fout);
 end
 
-function [rx, ry, rz] = rotation_angles_from_matrix(R)
-    sy = sqrt(R(1,1)^2 + R(2,1)^2);
-
-    if sy > 1e-6
-        rx = atan2(R(3,2), R(3,3)); % Rotation about X-axis
-        ry = atan2(-R(3,1), sy);    % Rotation about Y-axis
-        rz = atan2(R(2,1), R(1,1)); % Rotation about Z-axis
-    else
-        rx = atan2(-R(2,3), R(2,2));
-        ry = atan2(-R(3,1), sy);
-        rz = 0;
-    end
-
-    % Convert to degrees
-    rx = rad2deg(rx);
-    ry = rad2deg(ry);
-    rz = rad2deg(rz);
-end
 
 
 

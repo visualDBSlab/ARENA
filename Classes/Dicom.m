@@ -63,7 +63,8 @@ classdef Dicom < handle
                     end
                 case 'IMAGE'
                     referencedFile = strrep(rec.ReferencedFileID,'\',filesep);
-                    fullFilePath = fullfile(fileparts(obj.Dicomdir.Info.Filename), referencedFile);
+                    referencedFile = rec.ReferencedFileID;
+                    fullFilePath = fullfile(fileparts(obj.Dicomdir.Info.Filename), replace(referencedFile,'\','/'));
                     obj.raw_Files{end+1} = fullFilePath;
                     obj.raw_InstanceNumbers(end+1) = rec.InstanceNumber;
                     

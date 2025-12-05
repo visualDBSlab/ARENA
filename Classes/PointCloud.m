@@ -93,6 +93,10 @@ classdef PointCloud < ArenaActorRendering
                 
             end
         end
+
+        function obj = RAS2LPS(obj)
+            obj = obj.transform(diag([-1 -1 1 1]));
+        end
         
         
 
@@ -212,7 +216,7 @@ classdef PointCloud < ArenaActorRendering
                 elseif length(point.Vectors)==1
                     reference = repmat(point.Vectors.getArray',length(array),1);
                 else
-                    error('Dimenioins should match or it should be 1 Vector3D')
+                    error('Dimensions should match or it should be 1 Vector3D')
                     
                 end
             elseif isa(point,'Vector3D')

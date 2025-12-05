@@ -389,6 +389,7 @@ classdef ArenaScene < handle
 
             obj.handles.menu.dynamic.Slicei.cluster1 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [GPiPD_spots]','callback',{@menu_extractClusters1},'Enable','off');
             obj.handles.menu.dynamic.Slicei.cluster2 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [StimInduced Bradykinesia]','callback',{@menu_extractClusters2},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.cluster3 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [UPDRS hot/sour spot]','callback',{@menu_extractClusters3},'Enable','off');
             obj.handles.menu.dynamic.ObjFile.obj2mesh = uimenu(obj.handles.menu.dynamic.generate.main,'Text','ObjFile: convert to Mesh','callback',{@menu_obj2mesh},'Enable','off');
             
             
@@ -423,7 +424,9 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: color Vertex','callback',{@menu_colorVertex},'Enable','off');
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: convex hull','callback',{@menu_convexhull},'Enable','off');
             obj.handles.menu.dynamic.Mesh.flipNormals = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: flip normals','callback',{@menu_flipNormals},'Enable','off');
+            obj.handles.menu.dynamic.Mesh.exportSTL = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: export STL (LPS)','callback',{@menu_exportSTL},'Enable','off');
             
+
             obj.handles.menu.dynamic.ObjFile.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.whereIsIt = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it exactly?','callback',{@menu_WhereIsElectrode},'Enable','off');
@@ -436,7 +439,7 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Slicei.smooth = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: smooth','callback',{@menu_smoothslice},'Enable','off');
             obj.handles.menu.dynamic.Slicei.mask = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: apply mask','callback',{@menu_applyMask},'Enable','off');
             obj.handles.menu.dynamic.Slicei.segmentElectrode = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: extract Lead From CT','callback',{@menu_extractLeadFromCT},'Enable','off');
-            obj.handles.menu.dynamic.Slicei.generateGrid = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: generate mm-grid on slice','callback',{@menu_generateGrid},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.generateGrid = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: generate cm-grid on slice','callback',{@menu_generateGrid},'Enable','off');
             obj.handles.menu.dynamic.Slicei.SPM = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: Use SPM to warp image to.. ','callback',{@menu_SPM},'Enable','off');
             obj.handles.menu.dynamic.Slicei.burnIn = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: burn in image to this actor','callback',{@burnInImage},'Enable','off');
             
@@ -1034,6 +1037,43 @@ classdef ArenaScene < handle
                 end
 
             end
+
+            function menu_extractClusters3(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+
+                %--- Presets
+                SMOOTHITERATIONS = 11;
+                POSITIVE_THRESHOLD = 0.7;
+                NEGATIVE_THRESHOLD = -0.3;
+
+               
+                disp('### Clustering presets for [UPDRS sweet/sour spots] ###')
+                
+                for iActor = 1:numel(currentActors)
+                    actor = currentActors(iActor);
+                    vd = currentActors(iActor).Data.parent.copy(); %copy to make sure smoothing operations do not overwrite source data
+
+                    disp(['Smoothing with kernel size: ',num2str(3)])
+                    for i = 1:SMOOTHITERATIONS
+                        vd.smooth()
+                    end
+
+                    disp(['Thresholding <',num2str(NEGATIVE_THRESHOLD)])
+                    new_actor = vd.getmesh(NEGATIVE_THRESHOLD).see(scene);
+                    new_actor.changeName(['[SOUR] - based on: ',actor.Tag]);
+
+                    disp(['Thresholding >',num2str(POSITIVE_THRESHOLD)])
+                    new_actor = vd.getmesh(POSITIVE_THRESHOLD).see(scene);
+                    new_actor.changeName(['[SWEET] - based on: ',actor.Tag]);
+
+
+
+                end
+
+            end
+
+
             function menu_moveTransformationMatrix(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
@@ -2862,6 +2902,7 @@ classdef ArenaScene < handle
             
             
             function menu_generateGrid(hObject,eventdata)
+                D = 0.25;
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
                 for iActor = 1:numel(currentActors)
@@ -2873,17 +2914,14 @@ classdef ArenaScene < handle
                     ymax = max(thisActor.Visualisation.handle.YData(:));
                     zmin =  min(thisActor.Visualisation.handle.ZData(:));
                     zmax = max(thisActor.Visualisation.handle.ZData(:));
-                    [x,y,z] = meshgrid(xmin:10:xmax,...
-                        ymin:10:ymax,...
-                        zmin:10:zmax);
+                    [x,y,z] = meshgrid(xmin:D:xmax,...
+                        ymin:D:ymax,...
+                        zmin:D:zmax);
                     
                     
                     pc = PointCloud([x(:),y(:),z(:)]);
                     new = pc.see(scene);
                     new.changeName(['Grid_10mm_',thisActor.Tag])
-                    
-                    
-
                 end
                 
             end
@@ -4248,6 +4286,28 @@ classdef ArenaScene < handle
                     A_addToVTApool(thisActor,scene)
                 end
             end
+
+            function menu_exportSTL(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+                
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor);
+                    M = thisActor.Data.copy(); %mesh
+
+                    %RAS to LPS
+                    T = diag([-1 -1 1 1]);
+                    T(3,4) = -20; %Z-offset seems to help. Dont know why
+                    M.Vertices = SDK_transform3d(M.Vertices,T);
+
+                    %
+
+                    %save
+                    M.stlwrite([thisActor.Tag,'.stl'])
+
+                end
+
+            end
             
             function menu_seperateClusters(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
@@ -4354,6 +4414,9 @@ classdef ArenaScene < handle
                         selection = listdlg('ListString',{scene.Actors.Tag},'PromptString','Find target..',...
                             'SelectionMode','single');
                         target = scene.Actors(selection).Data;
+                        if debugmode
+                            F = Fibers;
+                        end
  
                         distances = [];
                         actors = {};
@@ -4388,7 +4451,9 @@ classdef ArenaScene < handle
                             end
 
                         end               
-                        
+                        if debugmode
+                            actor = F.see(scene);
+                        end
                         actors = actors' ;
                         distances = distances';
                 end
@@ -4414,7 +4479,7 @@ classdef ArenaScene < handle
                                         pc = PointCloud;
                                         pc.addVectors(v1);
                                         pc.addVectors(thisFiber.Vectors(iVector));
-                                        F.addFiber(pc,iVector,d(iVector));
+                                        bF.addFiber(pc,iVector,d(iVector));
                                     end
                                 end
 

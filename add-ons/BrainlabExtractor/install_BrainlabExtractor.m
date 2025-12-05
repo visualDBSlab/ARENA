@@ -56,7 +56,8 @@ menuhandle.UserData.nativepair.main = sephere2;
 menuhandle.UserData.nativepair.link = [];
 
 %hack SPM so that it exports the inverse warp
-BrainlabExtractor_hackSPM()
+
+%BrainlabExtractor_hackSPM()
 
 
 disp('Docking complete')

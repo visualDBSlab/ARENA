@@ -274,6 +274,16 @@ classdef Mesh < handle & matlab.mixin.Copyable & ArenaActorRendering
            
   
         end
+
+
+        function obj = RAS2LPSImageSpaceCorrection(obj,LPSorigin,fullwidth)
+            RASorigin = [LPSorigin(1)+fullwidth(1),...
+                    LPSorigin(2)+fullwidth(2),...
+                    LPSorigin(3)];
+
+            obj.Vertices = PointCloud(obj.Vertices).RAS2LPS().Vectors.getArray()+RASorigin; 
+        end
+
         
         function saveToFolder(obj,outdir,tag)
             %save obj, voxeldata and thresholded voxeldat
