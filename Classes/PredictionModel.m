@@ -6,13 +6,16 @@ classdef PredictionModel < handle
         Heatmap
         SamplingMethod = @A_15bins;
         TrainingLinearModel
+        TrainigLinearModel_cov
         Tag
+        Path
         %Description
     end
     
     properties (Hidden)
         
         B
+        B_cov
     end
     
     methods
@@ -59,6 +62,7 @@ classdef PredictionModel < handle
             obj.TrainingLinearModel = TrainingModule.LOOmdl;
             obj.B = TrainingModule.LOOmdl.Coefficients.Estimate;
             obj.Tag = obj.Heatmap.Tag;
+            obj.Path = TrainingModule.VDS.RecipePath;
             
             obj.printTrainingDetails
             
@@ -112,9 +116,18 @@ classdef PredictionModel < handle
 
             
         end
+
+        function f= plotLOOCV_cov(obj)
+            mdl = obj.LOOCV_cov('this string avoids that the plotting is triggered twice');
+            f = obj.plotmdl(mdl,'LOOCV with covariates');
+        end
         
         function f = plotLOOCV(obj)
-            mdl = obj.LOOCV;
+            mdl = obj.LOOCV();
+
+            f = obj.plotmdl(mdl,'LOOCV ');
+        end
+        function fig = plotmdl(obj,mdl,txt)
 
             fig = figure;
             mdl.plot;
@@ -123,7 +136,7 @@ classdef PredictionModel < handle
             x_text = 'Prediction';%; %
             tag = strsplit(obj.Tag,' ');
             y_text = tag{2};
-            t_text = ['LOOCV ',y_text];%
+            t_text = [txt,' ',y_text];%
             p = mdl.ModelFitVsNullModel.Pvalue;
             r2 = mdl.Rsquared.Ordinary;
                 
@@ -151,6 +164,8 @@ classdef PredictionModel < handle
 
 
         end
+
+
         
         function [prediction,predictors] = predictVoxelData(obj,VD)
            
@@ -240,6 +255,62 @@ classdef PredictionModel < handle
                 mdl = LOORoutine.quickLOOCV(predictors,truth');
             end
             
+        end
+
+        function mdl = LOOCV_cov(obj,internalcall)
+
+            %load excel sheet
+            tableRecipe = readtable(obj.Path);
+
+            %select covariates
+            options = tableRecipe.Properties.VariableNames(4:end);
+            choice = listdlg('ListString',options,'PromptString','Select a label:','SelectionMode','multiple');
+            scoreTag = options(choice);
+            
+            %spatial output
+            spatial = obj.TrainingLinearModel.predict;
+            covariates = array2table(spatial);
+
+
+            %get additional covariate data
+            for iTag = 1:numel(scoreTag)
+                covariates.(scoreTag{iTag}) = tableRecipe.(scoreTag{iTag});
+            end
+
+
+            
+
+            %truth
+            mtrx  = table2array(obj.TrainingLinearModel.Variables);
+            truth = mtrx(:,end);
+            
+
+            %LOOCV
+            disp('')
+            disp('-----------------')
+            disp('LOOCV with covariates')
+            disp('----------------')
+            mdl = LOORoutine.quickLOOCV(table2array(covariates),truth')
+            disp('LOOCV model is accessible as mdlLOOCV in workspace')
+            assignin("base",'mdlLOOCV',mdl)
+
+            %LOO for predictions later on.
+            disp('')
+            disp('-----------------')
+            disp('LOO with covariates for future predictions')
+            disp('----------------')
+            covariates.truth = truth;
+            covmdl = fitlm(covariates,'truth')
+            obj.TrainigLinearModel_cov = covmdl;
+            obj.save
+            disp('LOO model is accessible as mdlCOV in workspace')
+            assignin("base",'mdlCOV',covmdl)
+
+            if nargin==1
+                obj.plotmdl(mdl,'LOOCV with covariates');
+            end
+            
+
         end
         
         function spearman(obj)
