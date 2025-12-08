@@ -16,6 +16,7 @@ classdef PredictionModel < handle
         
         B
         B_cov
+        stats = struct()
     end
     
     methods
@@ -112,7 +113,9 @@ classdef PredictionModel < handle
 
             PredictionModel.styleFig(fig)
 
-
+            %extract the plot data:    
+            ax = gca;
+            obj.stats.Training = ax.Children(1);
 
             
         end
@@ -120,6 +123,13 @@ classdef PredictionModel < handle
         function f= plotLOOCV_cov(obj)
             mdl = obj.LOOCV_cov('this string avoids that the plotting is triggered twice');
             f = obj.plotmdl(mdl,'LOOCV with covariates');
+
+            %extract the plot data:    
+            ax = gca;
+            obj.stats.LOOCV_cov = ax.Children(1);
+
+
+
         end
 
         function vif_on_covariates(obj)
@@ -143,6 +153,11 @@ classdef PredictionModel < handle
             mdl = obj.LOOCV();
 
             f = obj.plotmdl(mdl,'LOOCV ');
+
+            %extract the plot data:    
+            ax = gca;
+            obj.stats.LOOCV = ax.Children(1);
+
         end
         function fig = plotmdl(obj,mdl,txt)
 
