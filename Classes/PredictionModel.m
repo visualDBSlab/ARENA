@@ -121,6 +121,23 @@ classdef PredictionModel < handle
             mdl = obj.LOOCV_cov('this string avoids that the plotting is triggered twice');
             f = obj.plotmdl(mdl,'LOOCV with covariates');
         end
+
+        function vif_on_covariates(obj)
+            if isempty(obj.TrainigLinearModel_cov)
+                disp('No covariate model was trained')
+            end
+
+            data = table2array(obj.TrainigLinearModel_cov.Variables);
+            R0 = corrcoef(data);
+            vif = diag(inv(R0))';
+            names = obj.TrainigLinearModel_cov.VariableNames;
+            for i = 1:length(names)
+                fprintf('%s: %.3f\n', names{i}, vif(i));
+            end
+
+
+
+        end
         
         function f = plotLOOCV(obj)
             mdl = obj.LOOCV();
