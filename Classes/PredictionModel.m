@@ -309,9 +309,6 @@ classdef PredictionModel < handle
                 covariates.(scoreTag{iTag}) = tableRecipe.(scoreTag{iTag});
             end
 
-
-            
-
             %truth
             mtrx  = table2array(obj.TrainingLinearModel.Variables);
             truth = mtrx(:,end);

@@ -159,8 +159,6 @@ classdef ArenaScene < handle
                 'max',100);
             
             
-            
-            
             obj.handles.btn_toggleleft = uicontrol('style','togglebutton',...
                 'units','normalized',...
                 'position', [xpadding,ypadding,0.4,buttonheight],...
@@ -5542,51 +5540,65 @@ classdef ArenaScene < handle
         end
         
         function refreshLayers(obj)
-            %colors
-            pre = '<HTML><FONT color="';
-            mid = '</FONT>';
-            post = '</HTML>';
-            
-            
             ActorTags = {};
-            if isempty(obj)
-                return
-            end
-            for i = 1:numel(obj.Actors)
-                try
-                    properties = fieldnames(obj.Actors(i).Visualisation.settings);
-                    rgbColour = obj.Actors(i).Visualisation.settings.(properties{1})*255;
-                    if isfield(obj.Actors(i).Visualisation.settings,'colorFace2') %for fibers
-                        rgbColour = obj.Actors(i).Visualisation.settings.colorFace2*255;
+            if ~isMATLABReleaseOlderThan('R2025a')
+
+                for i = 1:numel(obj.Actors)
+
+                    if obj.Actors(i).Visible
+                        bubble = '⬤';
+                    else
+                        bubble ='◯';
                     end
-                catch %no visualisation properties exist.
-                    rgbColour = [0 0 0];
+                    str = [bubble,' ', obj.Actors(i).Tag];
+                    ActorTags{i} = str;
                 end
-                
-                if isnan(rgbColour(1));rgbColour = [0 0 0];end
-                
-                hexStr = reshape( dec2hex( round(rgbColour), 2 )',1, 6);
-                
-                if obj.Actors(i).Visible
-                    bubble = '&#11044;';
-                else
-                    bubble ='&#9711;';
+                obj.handles.panelright.String = ActorTags;
+            else
+                %colors
+                pre = '<HTML><FONT color="';
+                mid = '</FONT>';
+                post = '</HTML>';
+
+                if isempty(obj)
+                    return
                 end
-                str = [pre, hexStr, '">', bubble,' ',mid, obj.Actors(i).Tag, post];
-                ActorTags{i} = str;
+                for i = 1:numel(obj.Actors)
+                    try
+                        properties = fieldnames(obj.Actors(i).Visualisation.settings);
+                        rgbColour = obj.Actors(i).Visualisation.settings.(properties{1})*255;
+                        if isfield(obj.Actors(i).Visualisation.settings,'colorFace2') %for fibers
+                            rgbColour = obj.Actors(i).Visualisation.settings.colorFace2*255;
+                        end
+                    catch %no visualisation properties exist.
+                        rgbColour = [0 0 0];
+                    end
+
+                    if isnan(rgbColour(1));rgbColour = [0 0 0];end
+
+                    hexStr = reshape( dec2hex( round(rgbColour), 2 )',1, 6);
+
+                    if obj.Actors(i).Visible
+                        bubble = '&#11044;';
+                    else
+                        bubble ='&#9711;';
+                    end
+                    str = [pre, hexStr, '">', bubble,' ',mid, obj.Actors(i).Tag, post];
+                    ActorTags{i} = str;
+                end
+                obj.handles.panelright.String = ActorTags;
             end
-            obj.handles.panelright.String = ActorTags;
-            
+
             if obj.handles.panelright.Value > numel(obj.handles.panelright.String)
                 obj.handles.panelright.Value = 1;
             end
-            
+
             obj.selectlayer()
             obj.updateMenu()
             drawnow()
-            
-            
-            
+
+
+
         end
         
         function updateMenu(obj)
