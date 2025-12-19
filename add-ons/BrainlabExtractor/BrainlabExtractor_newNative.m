@@ -21,7 +21,7 @@ else
 end
 
 %ask description of input
-options = {'STN left','STN right','GPi left','GPi right'};
+options = {'STN left','STN right','GPi left','GPi right','VIM left','VIM right'};
 [indx] = listdlg('PromptString',{['What is ',filename,'?']},...
     'SelectionMode','single','ListString',...
     options,...
@@ -29,7 +29,7 @@ options = {'STN left','STN right','GPi left','GPi right'};
 anatomy = options{indx};
 
 %load MNI reference
-references = {'STN left.obj','STN right.obj','GPi left.obj','GPi right.obj'};
+references = {'STN left.obj','STN right.obj','GPi left.obj','GPi right.obj','VIM left.obj','VIM right.obj'};
 reference = fullfile(referencePath,references{indx});
 [norm_V, ~] = load_obj(reference);
 
@@ -43,7 +43,9 @@ name = newid({'Save this warp as: '},'Arena',1,{name_suggestion});
     %initial move (coarse):
     norm_pca = compute_pca_landmarks(norm_V);       
     native_pca = compute_pca_landmarks(native_V); 
-    [R_init, t_init, s_init] = compute_similarity_transform(norm_pca, native_pca);
+
+    [norm_pca_sync,native_pca_sync] = sync_coordinates(norm_pca,native_pca);
+    [R_init, t_init, s_init] = compute_similarity_transform(norm_pca_sync, native_pca_sync);
     norm_V_coarse = (R_init * (norm_V' * s_init))' + t_init';
 
     T = eye(4);
@@ -71,7 +73,26 @@ save(fullfile(warpPath,['Native2Norm_',name{1},'.mat']),'T')
 BrainlabExtractor_updateNativeMenu(menu,eventdata,scene)
 Done;
 
+function [P1,P2_sync] = sync_coordinates(P1,P2)
+    P1_centered = P1 - mean(P1);
+    P2_centered = P2 - mean(P2);
 
+    permsP2 = perms(1:7);
+    min_cost = inf;
+    best_perm = [];
+
+    for i = 1:size(permsP2, 1)
+        permuted_P2 = P2_centered(permsP2(i, :), :);
+        cost = sum(vecnorm(P1_centered - permuted_P2, 2, 2));
+        if cost < min_cost
+            min_cost = cost;
+            best_perm = permsP2(i, :);
+        end
+    end
+
+    % Apply the best permutation to P2
+    P2_sync = P2(best_perm, :);
+end
 function [V, F] = load_obj(filename)
     % Basic OBJ loader for vertices and faces
     % Only supports 'v' and 'f' lines of a simple OBJ.

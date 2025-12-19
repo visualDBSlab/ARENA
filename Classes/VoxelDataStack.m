@@ -570,6 +570,17 @@ classdef VoxelDataStack < handle
             
             quickLoad = nan; %it will be tested if quickload is possible. his will skip reslicing.
             
+
+            %get mirroring style
+            if any(obj.Recipe.Move_or_keep_left(:))
+                liststr = {'no correction','STN','GPI','VIM'};
+                choice = listdlg('PromptString','The MNI space is asymmetric, do you want to correct for this while mirroring?',...
+                            'ListString',liststr,'ListSize',[500,160],'SelectionMode','single');
+                mirror = liststr{choice};
+            else
+                mirror = 'no correction';
+            end
+
             
             for i = 1:height(obj.Recipe)
                 disp('------------')
@@ -701,7 +712,7 @@ classdef VoxelDataStack < handle
                     %Mirror to the left.
                     cog = vd.getmesh(max(vd.Voxels(:))/3).getCOG;
                     if cog.x>1 && obj.Recipe.Move_or_keep_left(i)
-                        vd.mirror;
+                        vd.mirror(mirror,'left');
                         printwhendone{end+1} = ['____mirrored: ',obj.Recipe.fullpath{i}];
                     else
                         printwhendone{end+1} = ['not_mirrored: ',obj.Recipe.fullpath{i}];

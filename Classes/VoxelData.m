@@ -104,6 +104,21 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
             end
         end
 
+        function obj = captureMesh(obj,m)
+
+            corner_1 = floor(min(m.Vertices)-[1,1,1]);
+            corner_2 = ceil(max(m.Vertices)+[1,1,1]);
+            xWorldLimits = [corner_1(1),corner_2(1)];
+            yWorldLimits = [corner_1(2),corner_2(2)];
+            zWorldLimits = [corner_1(3),corner_2(3)];
+
+
+            R = imref3d(imageSize,xWorldLimits,yWorldLimits,zWorldLimits)
+
+
+            obj = m.convertToVoxelsInTemplate(obj)
+        end
+
 
         function objout = move(obj,v3D)
             %does not overwrite the obj, unless no output is requested.
@@ -1190,9 +1205,27 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
             end
         end
 
-        function newObj = mirror(obj)
+        function newObj = mirror(obj,anatomy,side)
 
             [imOut,rOut] = imwarp(obj.Voxels,obj.R,affine3d(diag([-1 1 1 1])));
+            if nargin>1
+                load('MNI_Mirror_correction.mat');
+                if contains(lower(anatomy),'stn') && contains(lower(side),'left')
+                    T = MNI_Mirror_correction.STNLEFT;
+                elseif contains(lower(anatomy),'stn') && contains(lower(side),'right')
+                    T = MNI_Mirror_correction.STNRIGHT;
+                elseif contains(lower(anatomy),'gpi') && contains(lower(side),'left')
+                    T = MNI_Mirror_correction.GPILEFT;
+                elseif contains(lower(anatomy),'gpi') && contains(lower(side),'right')
+                    T = MNI_Mirror_correction.GPIRIGHT;
+                elseif contains(lower(anatomy),'vim') && contains(lower(side),'left')
+                    T = MNI_Mirror_correction.VIMLEFT;
+                elseif contains(lower(anatomy),'vim') && contains(lower(side),'right')
+                    T = MNI_Mirror_correction.VIMRIGHT;
+                end
+                [imOut,rOut] = imwarp(imOut,rOut,affine3d(T));
+            end
+                    
 
             if nargout==1
                 newObj = VoxelData(imOut,rOut);

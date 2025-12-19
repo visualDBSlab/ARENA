@@ -354,6 +354,7 @@ classdef ArenaScene < handle
             %obj.handles.menu.transform.selectedlayer.main = uimenu(obj.handles.menu.transform.main,'Text','Selected Layer');
             obj.handles.menu.transform.selectedlayer.old.main = uimenu(obj.handles.menu.transform.main,'Text','historical');
             obj.handles.menu.transform.selectedlayer.simple.main = uimenu(obj.handles.menu.transform.main,'Text','simple');
+            obj.handles.menu.transform.selectedlayer.MNI.main = uimenu(obj.handles.menu.transform.main,'Text','MNI asymmetric mirror to..');
             obj.handles.menu.transform.selectedlayer.transformInElectrodeSpace.main = uimenu(obj.handles.menu.transform.main,'Text','move / rotate in electrode space');
             obj.handles.menu.transform.selectedlayer.transformInElectrodeSpace.electrodes=[]; %will be added automatically with the menu_electrodespace function.
             
@@ -361,6 +362,13 @@ classdef ArenaScene < handle
             obj.handles.menu.transform.selectedlayer.mirror = uimenu(obj.handles.menu.transform.selectedlayer.simple.main,'Text','mirror left/right','callback',{@menu_mirror});
             obj.handles.menu.transform.selectedlayer.yeb2mni = uimenu(obj.handles.menu.transform.selectedlayer.old.main,'Text','Legacy 2019 --> arena2021','callback',{@menu_Fake2MNI});
             obj.handles.menu.transform.selectedlayer.arena2leadmni.main = uimenu(obj.handles.menu.transform.main,'Text','arena2021 to arena2022');
+
+            obj.handles.menu.transform.selectedlayer.mirrorMNISTNLEFT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..left STN','callback',{@menu_mirrorMNI,'STNLEFT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNISTNRIGHT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..right STN','callback',{@menu_mirrorMNI,'STNRIGHT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIGPILEFT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..left GPI','callback',{@menu_mirrorMNI,'GPILEFT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIGPIRIGHT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..right GPI','callback',{@menu_mirrorMNI,'GPIRIGHT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIVIMLEFT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..left VIM','callback',{@menu_mirrorMNI,'VIMLEFT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIVIMRIGHT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..right VIM','callback',{@menu_mirrorMNI,'VIMRIGHT'});
             
             obj.handles.menu.transform.selectedlayer.arena2leadmni.leftstn = uimenu(obj.handles.menu.transform.selectedlayer.arena2leadmni.main, 'Text','leftSTN','callback',{@menu_MNI2leaddbsMNI});
             obj.handles.menu.transform.selectedlayer.arena2leadmni.rightstn = uimenu(obj.handles.menu.transform.selectedlayer.arena2leadmni.main, 'Text','rightSTN','callback',{@menu_MNI2leaddbsMNI});
@@ -895,15 +903,38 @@ classdef ArenaScene < handle
                         copyActor.changeSetting('cathode',thisActor.Visualisation.settings.cathode);
                         copyActor.changeSetting('anode', thisActor.Visualisation.settings.anode);
                         copyActor.changeName([thisActor.Tag])
-                        
-                        
                     else
                         thisActor.transform(scene,'mirror')
                     end
                     thisActor.changeName(['[mirror]  ',thisActor.Tag])
                 end
-                
-                
+            end
+
+            function menu_mirrorMNI(hObject,eventdata,ANATOMYSIDE)
+                scene = ArenaScene.getscenedata(hObject);
+                actorList = ArenaScene.getSelectedActors(scene);
+                loaded= load('MNI_Mirror_correction.mat');
+                T = diag([-1 1 1 1])*loaded.MNI_Mirror_correction.(ANATOMYSIDE);
+                for iActor = 1:numel(actorList)
+                    thisActor = actorList(iActor);
+                    
+                    if isa(thisActor.Data,'Electrode')
+                        eOriginal = thisActor.Data;
+                       
+                        eNew = Electrode(SDK_transform3d(eOriginal.C0.getArray',T),...
+                            SDK_transform3d(eOriginal.Direction.getArray',T));
+                        eNew.Type = thisActor.Data.Type;
+                        %vc = VectorCloud(Points(order(1)),direction.unit);
+                        copyActor = eNew.see(ArenaScene.getscenedata(hObject));
+                        copyActor.changeSetting('cathode',thisActor.Visualisation.settings.cathode);
+                        copyActor.changeSetting('anode', thisActor.Visualisation.settings.anode);
+                        copyActor.changeName([thisActor.Tag])
+                    else
+                        thisActor.transform(scene,'T',T)
+                    end
+                    thisActor.changeName(['[MNI mirror]  ',thisActor.Tag])
+                end
+
             end
             
             function menu_whoisthis(hObject,eventdata)
@@ -929,7 +960,8 @@ classdef ArenaScene < handle
                 actorList = ArenaScene.getSelectedActors(scene);
                 for iActor = 1:numel(actorList)
                     thisActor = actorList(iActor);
-                    thisActor.obj2mesh(scene);
+                    m = thisActor.Data.convertToMesh();
+                    m.see(scene)
                 end
             end
             
@@ -3517,9 +3549,14 @@ classdef ArenaScene < handle
             function menu_mesh2binaryslice(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
-                
-                
-                binaryvd = currentActors(1).Data.Source.makeBinary(currentActors(1).Data.Settings.T);
+                if isempty(currentActors.Data.Source)
+                    binaryvd = VoxelData().captureMesh(currentActors.Data);
+                    
+                    
+                else
+                    binaryvd = currentActors(1).Data.Source.makeBinary(currentActors(1).Data.Settings.T);
+
+                end
                 binaryvd.getslice.see(scene)
                 
             end
