@@ -142,7 +142,14 @@ classdef Mesh < handle & matlab.mixin.Copyable & ArenaActorRendering
                 
                 
                 [testTheseX,testTheseY,testTheseZ] = meshgrid(gridXvalues,gridYvalues,gridZvalues);
-                white = inpolyhedron(fv, [testTheseX(:),testTheseY(:),testTheseZ(:)]);%,'flipnormals', true);
+                whiteflip = inpolyhedron(fv, [testTheseX(:),testTheseY(:),testTheseZ(:)],'flipnormals', true);
+
+
+                if std(testTheseX(whiteflip))+std(testTheseY(whiteflip))+std(testTheseZ(whiteflip)) < std(testTheseX(~whiteflip))+std(testTheseY(~whiteflip))+std(testTheseZ(~whiteflip))
+                    white = whiteflip;
+                else
+                    white = inpolyhedron(fv, [testTheseX(:),testTheseY(:),testTheseZ(:)]);
+                end
 
                 %if two opposing  corners are white, then the image is
                 %probably inverted

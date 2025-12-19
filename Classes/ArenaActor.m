@@ -393,7 +393,11 @@ classdef ArenaActor < handle & matlab.mixin.Copyable
                 case 'slice'
                     switch class(obj.Data)
                         case 'Mesh'
-                            actor = obj.Data.Source.getslice.see(obj.Scene);
+                            if not(isempty(obj.Data.Source))
+                                actor = obj.Data.Source.getslice.see(obj.Scene);
+                            else
+                                actor = VoxelData().captureMesh(obj.Data).getslice.see(obj.Scene);
+                            end
                             actor.changeName(obj.Tag)
                         otherwise
                             keyboard

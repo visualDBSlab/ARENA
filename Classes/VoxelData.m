@@ -111,12 +111,16 @@ classdef VoxelData <handle &  matlab.mixin.Copyable
             xWorldLimits = [corner_1(1),corner_2(1)];
             yWorldLimits = [corner_1(2),corner_2(2)];
             zWorldLimits = [corner_1(3),corner_2(3)];
+            
+            imageSize = [diff(xWorldLimits)/0.5+1,...
+                diff(yWorldLimits)/0.5+1,...
+                diff(zWorldLimits)/0.5+1
+                ];
 
+            obj.Voxels = zeros(imageSize);
+            obj.R = imref3d(imageSize,xWorldLimits,yWorldLimits,zWorldLimits);
 
-            R = imref3d(imageSize,xWorldLimits,yWorldLimits,zWorldLimits)
-
-
-            obj = m.convertToVoxelsInTemplate(obj)
+            obj = m.convertToVoxelsInTemplate(obj);
         end
 
 
