@@ -1769,6 +1769,9 @@ classdef ArenaScene < handle
                 elseif isfield(loaded,'atlases')
                     import_leadDBSatlas(thisScene,loaded)
                     return
+                elseif isfield(loaded,'mdl')
+                    A_loadheatmap(thisScene,loaded.mdl.Heatmap);
+                    return
                 end
                 
                 
@@ -2218,8 +2221,14 @@ classdef ArenaScene < handle
                 
             end
             
-            function menu_vta_review(hObject,eventdata,vta)
-                vta.review()
+            function sortedlist = menu_vta_review(hObject,eventdata,vta,OPTIONALinput)
+                if nargin==4
+                    [~,sortedlist] = vta.review(OPTIONALinput);
+                else
+                    [~, sortedlist] = vta.review();
+                end
+
+
             end
             
             function menu_therapy_prediction(hObject,eventdata,therapy)
@@ -2271,13 +2280,20 @@ classdef ArenaScene < handle
                     error('for batch review, at least two electrodes/VTAs are needed');
                     return
                 end
+                
+                input = Therapy.UserInputModule();
+                output = {};
+                outputarray = [];
+
                 for ii=1:numel(scene.VTAstorage)
-                    menu_vta_review(hObject,eventdata, scene.VTAstorage(ii));
-                    
+                    sortedlist = menu_vta_review(hObject,eventdata, scene.VTAstorage(ii),input);
+                    output{ii} = sortedlist;
+                    outputarray(:,ii) = vertcat(sortedlist.ReviewData.predictionList(:).Output);
                 end
                 
                 
                 
+                keyboard
                 %                    menu_vta_review,scene.VTAstorage(i)}
                 
             end

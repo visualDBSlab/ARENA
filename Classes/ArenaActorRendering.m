@@ -480,7 +480,7 @@ classdef ArenaActorRendering < handle
                         else
                             
                             colorvalue = (obj.Weight(iH) - min(obj.Weight))/(max(obj.Weight)-min(obj.Weight));
-                            low = colorvalue;
+                            low = colorvalue
                             high = 1-low;
                             
                             lowRGB = settings.colorFace;

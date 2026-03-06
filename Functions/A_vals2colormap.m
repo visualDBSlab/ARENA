@@ -31,12 +31,13 @@ if ~iscell(vals)
     end
     % Generate the colormap
     cmap = colormap; %JR
+    cmap(end+1,:) = [0 0 0]; %JR
     % Normalize the values to be between 1 and 256
     vals(vals < crange(1)) = crange(1);
     vals(vals > crange(2)) = crange(2);
     valsN = round(((vals - crange(1)) ./ diff(crange)) .* 254)+1;
     % Convert any nans to ones
-    valsN(isnan(valsN)) = 1;
+    valsN(isnan(valsN)) = 256;
     % Convert the normalized values to the RGB values of the colormap
     rgb = cmap(valsN, :);
 elseif iscell(vals)
@@ -52,9 +53,13 @@ elseif iscell(vals)
         valsN(valsN > crange(2)) = crange(2);
         valsN = round(((valsN - crange(1)) ./ diff(crange)) .* 255)+1;
         % Convert any nans to ones
-        valsN(isnan(valsN)) = 1;
+        if isnan(valsN)
+            rgb{ii} = [0,0,0];
+        else
+        %valsN(isnan(valsN)) = 1;
         % Convert the normalized values to the RGB values of the colormap
-        rgb{ii} = cmap(valsN, :);
+            rgb{ii} = cmap(valsN, :);
+        end
     end
 end
 return

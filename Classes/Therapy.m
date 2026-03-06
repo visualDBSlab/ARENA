@@ -49,7 +49,7 @@ classdef Therapy < handle
         
         
         
-        function [obj,predictionlist] = executeReview(obj,OptionalInput)
+        function [obj,sortedList] = executeReview(obj,OptionalInput)
             %check available electrodes:
             Electrode_list = {obj.VTAs(:).Electrode};
             Electrode_present = not(cellfun(@isempty,{obj.VTAs(:).Electrode}));

@@ -10,11 +10,15 @@ if nargin==1
         hm.loadHeatmap(fullfile(pathname,filename));
     end
 else
-    try 
-        hm=Heatmap;
-        hm.loadHeatmap(heatmapfile);
-    catch
-    hm=load(heatmapfile,'-mat');
+    if ischar(heatmapfile)
+        try 
+            hm=Heatmap;
+            hm.loadHeatmap(heatmapfile);
+        catch
+        hm=load(heatmapfile,'-mat');
+        end
+    else
+        hm = heatmapfile;
     end
     
 end
