@@ -44,8 +44,8 @@ Once launched, ARENA displays the 3D viewport, where different actors (data laye
 ARENA visualizes data through actors—modular components that represent a specific object in 3D space. Actor types are highly flexible and support interaction, transformation, and analysis.
 
 Actors are generally divided into two categories:
-* Primitive/Basic Actors: Represent low-level geometric or imaging data
-* Composite/Research-Level Actors: Aggregate multiple components for higher-level interpretation
+* Basic Actors: Represent low-level geometric or imaging data
+* Composit Actors: Aggregate multiple components for higher-level interpretation
 
 ### Basic Actors:
 * VoxelData: 3D volumetric dataset
@@ -60,18 +60,22 @@ Actors are generally divided into two categories:
 
 All these actors can be individually manipulated, visualized, and used in spatial analysis.
 
-### Composite / Research-Level Actor Types
+### Composite Actor Types
 
 ARENA also supports composite actors that integrate multiple data types into a unified structure. These are particularly valuable for advanced research workflows.
 
 _VTA (Volume of Tissue Activated)_
 > TheVTA class models the region of brain tissue affected by a DBS setup. As it is often the core of a research question The VTA class will hold references to all relevant aspects related to the VTA for contextual metadata.
+
 _Heatmap_
 > TheVTA class models the region of brain tissue affected by a DBS setup. As it is often the core of a research question The VTA class will hold references to all relevant aspects related to the VTA for contextual metadata.
+
 _LOORoutine_
 > This composites the input data (VoxelDataStack) and analysis method (BiteAnalysis) and is able to perform leave-one-out analysis with the specified method on the provided data.
+
 _Prediction_
 > PredictionModels are final products of studies. The prediction class allows to load these models and a VTA, and predict the outcome for the VTA.
+
 _BiteAnalysis_
 > There are various ways how a VTA can interact with a heatmap to produce a prediction. The BiteAnalysis class provides the framework for a modular design of the tools.
 
