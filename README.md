@@ -22,6 +22,10 @@ ARENA is designed for researchers working with deep brain stimulation data, part
 * [lead-dbs.org](https://www.lead-dbs.org/)
 * [SuretuneSDK](https://github.com/JonasRoothans/SuretuneSDK)
 
+> [!Note]
+> Functionality from SuretuneSDK and lead-dbs is used in several functions. For a smooth run, it is strongly recommended to download both toolboxes.
+
+
 **Step-by-step Installation**
 1. Clone the ARENA repository
 2. Download and install dependencies
