@@ -160,6 +160,12 @@ classdef Dicomdir < handle
             obj.applyBestFlip(slave,bestflip)
 
             seg = D.VoxelData - D.VoxelData_background;
+            seg.Tag = D.VoxelData.Tag;
+
+            midpoint  = mean([max(seg.Voxels(:)),min(seg.Voxels(:))]);
+            if midpoint>1 %if it is below 1, it is already binary, I guess
+                seg.Voxels = seg.Voxels>midpoint;
+            end
 
 
         end
