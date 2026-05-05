@@ -97,6 +97,15 @@ _BiteAnalysis_
 * `h`: hide or show the layer
 * `s`: allow selecting layer in the 3D viewport.
 
+# Demo 
+
+Do you want to get started right away? Good idea! Demo data for two example use cases is provided.
+
+_Let's go_
+ > Browse to the ARENA > Examples folder to find data and scripts.
+_Find example 1_
+> type `edit example1` to find the first script. It is not recommended to run the entire script at once. Use it to copy lines of code to the command window or use it in your own script. The examples simply provide ideas.
+
 
 
 
