@@ -31,11 +31,13 @@ ARENA is designed for researchers working with deep brain stimulation data, part
 2. Download and install dependencies
    * Download and install Lead-DBS by following instructions at [lead-dbs.org](https://www.lead-dbs.org/)
    * Clone or download [SuretuneSDK](https://github.com/JonasRoothans/SuretuneSDK) into a known directory.
-3. Add ARENA to MATLAB path
-   > Browse to the ARENA folder and right click-click to add this folder and subfolders to the path.
+3. Navigate to ARENA path inside MATLAB.
+   > Use the "Current Folder" window in MATLAB to find the ARENA folder on your computer.
 4. Run the setup
    >`startArena`
-   >During this step, you will be prompted to locate the directories of Lead-DBS and SuresuiteSDK. These locations will be stored.
+   >During this step, you will be prompted to locate the directories of Lead-DBS and SuresuiteSDK. These locations will be stored and not    asked again.
+   > [!Tip]
+   > Delete the config.mat file to trigger installation at next run.
 5. Launch ARENA
    > `startArena` or to directly open a 3D viewport `newScene`.
 
