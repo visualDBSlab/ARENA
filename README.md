@@ -35,9 +35,7 @@ ARENA is designed for researchers working with deep brain stimulation data, part
    > Use the "Current Folder" window in MATLAB to find the ARENA folder on your computer.
 4. Run the setup
    >`startArena`
-   >During this step, you will be prompted to locate the directories of Lead-DBS and SuresuiteSDK. These locations will be stored and not    asked again.
-   > [!Tip]
-   > Delete the config.mat file to trigger installation at next run.
+   >During this step, you will be prompted to locate the directories of Lead-DBS and SuresuiteSDK. These locations will be stored and not    asked again. (Delete config.mat to trigger the set-up procedure again) 
 5. Launch ARENA
    > `startArena` or to directly open a 3D viewport `newScene`.
 
