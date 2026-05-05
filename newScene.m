@@ -2,6 +2,8 @@ function scene = newScene(OPTIONALname)
 %NEWSCENE Opens a new scene. Optional input: scene name
     global arena 
         if not(isa(arena,'ArenaManager'))
+            currentdir = fileparts(mfilename('fullpath'));
+            addpath(fullfile(currentdir,'Classes'))
             [arena,scene] = ArenaManager();
         else
         
