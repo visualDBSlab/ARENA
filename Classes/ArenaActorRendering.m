@@ -30,7 +30,11 @@ classdef ArenaActorRendering < handle
             switch class(obj)
                 case 'PointCloud'
                     settings.colorLow = scene.getNewColor(scene);
-                    settings.colorHigh = 1-scene.getNewColor(scene);
+                    if obj.Weights==0
+                        settings.colorHigh = settings.colorLow;
+                    else
+                        settings.colorHigh = 1-scene.getNewColor(scene);
+                    end
                     settings.thickness = 100;
                     settings.opacity = 100;
                 case 'Fibers'

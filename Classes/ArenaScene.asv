@@ -4,7 +4,7 @@ classdef ArenaScene < handle
     %   You can open a scene with:
     %   -   myScene = newScene();
     %   -   or startArena;
-    %
+    % 
     %   See also ARENAACTOR
     
     properties
@@ -157,8 +157,6 @@ classdef ArenaScene < handle
                 'position',[1-xpadding-0.4 ypadding+buttonheight 0.4 0.3],...
                 'callback',{@panelright_callback},...
                 'max',100);
-            
-            
             
             
             obj.handles.btn_toggleleft = uicontrol('style','togglebutton',...
@@ -336,6 +334,8 @@ classdef ArenaScene < handle
             obj.handles.menu.edit.analysis.main = uimenu(obj.handles.menu.edit.main,'Text','Analyse selection');
             obj.handles.menu.edit.meta.main = uimenu(obj.handles.menu.edit.main,'Text','meta tags');
             obj.handles.menu.edit.meta.submenus = gobjects;%empty submenus
+
+             obj.handles.menu.drawbox.main = uimenu(obj.handles.menu.edit.main,'Text','drawBox','callback',{@menu_drawbox});
             
             
             obj.handles.menu.edit.analysis.sampleheatmap = uimenu(obj.handles.menu.edit.analysis.main,'Text','sample selection with ... ','callback',{@menu_sampleHeatmap});
@@ -354,6 +354,7 @@ classdef ArenaScene < handle
             %obj.handles.menu.transform.selectedlayer.main = uimenu(obj.handles.menu.transform.main,'Text','Selected Layer');
             obj.handles.menu.transform.selectedlayer.old.main = uimenu(obj.handles.menu.transform.main,'Text','historical');
             obj.handles.menu.transform.selectedlayer.simple.main = uimenu(obj.handles.menu.transform.main,'Text','simple');
+            obj.handles.menu.transform.selectedlayer.MNI.main = uimenu(obj.handles.menu.transform.main,'Text','MNI asymmetric mirror to..');
             obj.handles.menu.transform.selectedlayer.transformInElectrodeSpace.main = uimenu(obj.handles.menu.transform.main,'Text','move / rotate in electrode space');
             obj.handles.menu.transform.selectedlayer.transformInElectrodeSpace.electrodes=[]; %will be added automatically with the menu_electrodespace function.
             
@@ -361,6 +362,13 @@ classdef ArenaScene < handle
             obj.handles.menu.transform.selectedlayer.mirror = uimenu(obj.handles.menu.transform.selectedlayer.simple.main,'Text','mirror left/right','callback',{@menu_mirror});
             obj.handles.menu.transform.selectedlayer.yeb2mni = uimenu(obj.handles.menu.transform.selectedlayer.old.main,'Text','Legacy 2019 --> arena2021','callback',{@menu_Fake2MNI});
             obj.handles.menu.transform.selectedlayer.arena2leadmni.main = uimenu(obj.handles.menu.transform.main,'Text','arena2021 to arena2022');
+
+            obj.handles.menu.transform.selectedlayer.mirrorMNISTNLEFT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..left STN','callback',{@menu_mirrorMNI,'STNLEFT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNISTNRIGHT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..right STN','callback',{@menu_mirrorMNI,'STNRIGHT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIGPILEFT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..left GPI','callback',{@menu_mirrorMNI,'GPILEFT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIGPIRIGHT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..right GPI','callback',{@menu_mirrorMNI,'GPIRIGHT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIVIMLEFT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..left VIM','callback',{@menu_mirrorMNI,'VIMLEFT'});
+            obj.handles.menu.transform.selectedlayer.mirrorMNIVIMRIGHT = uimenu(obj.handles.menu.transform.selectedlayer.MNI.main,'Text','..right VIM','callback',{@menu_mirrorMNI,'VIMRIGHT'});
             
             obj.handles.menu.transform.selectedlayer.arena2leadmni.leftstn = uimenu(obj.handles.menu.transform.selectedlayer.arena2leadmni.main, 'Text','leftSTN','callback',{@menu_MNI2leaddbsMNI});
             obj.handles.menu.transform.selectedlayer.arena2leadmni.rightstn = uimenu(obj.handles.menu.transform.selectedlayer.arena2leadmni.main, 'Text','rightSTN','callback',{@menu_MNI2leaddbsMNI});
@@ -369,6 +377,10 @@ classdef ArenaScene < handle
             obj.handles.menu.transform.selectedlayer.move =  uimenu(obj.handles.menu.transform.selectedlayer.simple.main,'Text','Move','callback',{@menu_move});
             obj.handles.menu.transform.selectedlayer.transformationmatrix =  uimenu(obj.handles.menu.transform.selectedlayer.simple.main,'Text','Transformation matrix from workspace','callback',{@menu_moveTransformationMatrix});
             
+
+           
+
+
             obj.handles.menu.addons.main = uimenu(obj.handles.figure,'Text','Add-ons');
             menu_refreshAddOnsList(obj,[],'startup');
             
@@ -383,6 +395,7 @@ classdef ArenaScene < handle
 
             obj.handles.menu.dynamic.Slicei.cluster1 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [GPiPD_spots]','callback',{@menu_extractClusters1},'Enable','off');
             obj.handles.menu.dynamic.Slicei.cluster2 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [StimInduced Bradykinesia]','callback',{@menu_extractClusters2},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.cluster3 = uimenu(obj.handles.menu.dynamic.presets.main,'Text','Slice: extract clusters [UPDRS hot/sour spot]','callback',{@menu_extractClusters3},'Enable','off');
             obj.handles.menu.dynamic.ObjFile.obj2mesh = uimenu(obj.handles.menu.dynamic.generate.main,'Text','ObjFile: convert to Mesh','callback',{@menu_obj2mesh},'Enable','off');
             
             
@@ -417,7 +430,9 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: color Vertex','callback',{@menu_colorVertex},'Enable','off');
             obj.handles.menu.dynamic.Mesh.colorVertex = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: convex hull','callback',{@menu_convexhull},'Enable','off');
             obj.handles.menu.dynamic.Mesh.flipNormals = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Mesh: flip normals','callback',{@menu_flipNormals},'Enable','off');
+            obj.handles.menu.dynamic.Mesh.exportSTL = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Mesh: export STL (LPS)','callback',{@menu_exportSTL},'Enable','off');
             
+
             obj.handles.menu.dynamic.ObjFile.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.dynamicColor = obj.handles.menu.dynamic.Mesh.dynamicColor;
             obj.handles.menu.dynamic.Electrode.whereIsIt = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Electrode: Where is it exactly?','callback',{@menu_WhereIsElectrode},'Enable','off');
@@ -430,9 +445,10 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Slicei.smooth = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: smooth','callback',{@menu_smoothslice},'Enable','off');
             obj.handles.menu.dynamic.Slicei.mask = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: apply mask','callback',{@menu_applyMask},'Enable','off');
             obj.handles.menu.dynamic.Slicei.segmentElectrode = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: extract Lead From CT','callback',{@menu_extractLeadFromCT},'Enable','off');
-            obj.handles.menu.dynamic.Slicei.generateGrid = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: generate mm-grid on slice','callback',{@menu_generateGrid},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.generateGrid = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: generate cm-grid on slice','callback',{@menu_generateGrid},'Enable','off');
             obj.handles.menu.dynamic.Slicei.SPM = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: Use SPM to warp image to.. ','callback',{@menu_SPM},'Enable','off');
             obj.handles.menu.dynamic.Slicei.burnIn = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: burn in image to this actor','callback',{@burnInImage},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.split = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: split image in two images','callback',{@splitimage},'Enable','off');
             
             obj.handles.menu.dynamic.Fibers.interferenceWithMap = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Fibers: interference with map','callback',{@menu_fiberMapInterference},'Enable','off');
             obj.handles.menu.dynamic.Fibers.showFibersThatHitROI = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Fibers: showFibersThatHitROI','callback',{@menu_fiberROIcheck},'Enable','off');
@@ -888,15 +904,38 @@ classdef ArenaScene < handle
                         copyActor.changeSetting('cathode',thisActor.Visualisation.settings.cathode);
                         copyActor.changeSetting('anode', thisActor.Visualisation.settings.anode);
                         copyActor.changeName([thisActor.Tag])
-                        
-                        
                     else
                         thisActor.transform(scene,'mirror')
                     end
                     thisActor.changeName(['[mirror]  ',thisActor.Tag])
                 end
-                
-                
+            end
+
+            function menu_mirrorMNI(hObject,eventdata,ANATOMYSIDE)
+                scene = ArenaScene.getscenedata(hObject);
+                actorList = ArenaScene.getSelectedActors(scene);
+                loaded= load('MNI_Mirror_correction.mat');
+                T = diag([-1 1 1 1])*loaded.MNI_Mirror_correction.(ANATOMYSIDE);
+                for iActor = 1:numel(actorList)
+                    thisActor = actorList(iActor);
+                    
+                    if isa(thisActor.Data,'Electrode')
+                        eOriginal = thisActor.Data;
+                       
+                        eNew = Electrode(SDK_transform3d(eOriginal.C0.getArray',T),...
+                            SDK_transform3d(eOriginal.Direction.getArray',T));
+                        eNew.Type = thisActor.Data.Type;
+                        %vc = VectorCloud(Points(order(1)),direction.unit);
+                        copyActor = eNew.see(ArenaScene.getscenedata(hObject));
+                        copyActor.changeSetting('cathode',thisActor.Visualisation.settings.cathode);
+                        copyActor.changeSetting('anode', thisActor.Visualisation.settings.anode);
+                        copyActor.changeName([thisActor.Tag])
+                    else
+                        thisActor.transform(scene,'T',T)
+                    end
+                    thisActor.changeName(['[MNI mirror]  ',thisActor.Tag])
+                end
+
             end
             
             function menu_whoisthis(hObject,eventdata)
@@ -922,7 +961,8 @@ classdef ArenaScene < handle
                 actorList = ArenaScene.getSelectedActors(scene);
                 for iActor = 1:numel(actorList)
                     thisActor = actorList(iActor);
-                    thisActor.obj2mesh(scene);
+                    m = thisActor.Data.convertToMesh();
+                    m.see(scene)
                 end
             end
             
@@ -1028,6 +1068,43 @@ classdef ArenaScene < handle
                 end
 
             end
+
+            function menu_extractClusters3(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+
+                %--- Presets
+                SMOOTHITERATIONS = 11;
+                POSITIVE_THRESHOLD = 0.7;
+                NEGATIVE_THRESHOLD = -0.3;
+
+               
+                disp('### Clustering presets for [UPDRS sweet/sour spots] ###')
+                
+                for iActor = 1:numel(currentActors)
+                    actor = currentActors(iActor);
+                    vd = currentActors(iActor).Data.parent.copy(); %copy to make sure smoothing operations do not overwrite source data
+
+                    disp(['Smoothing with kernel size: ',num2str(3)])
+                    for i = 1:SMOOTHITERATIONS
+                        vd.smooth()
+                    end
+
+                    disp(['Thresholding <',num2str(NEGATIVE_THRESHOLD)])
+                    new_actor = vd.getmesh(NEGATIVE_THRESHOLD).see(scene);
+                    new_actor.changeName(['[SOUR] - based on: ',actor.Tag]);
+
+                    disp(['Thresholding >',num2str(POSITIVE_THRESHOLD)])
+                    new_actor = vd.getmesh(POSITIVE_THRESHOLD).see(scene);
+                    new_actor.changeName(['[SWEET] - based on: ',actor.Tag]);
+
+
+
+                end
+
+            end
+
+
             function menu_moveTransformationMatrix(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
@@ -1223,7 +1300,7 @@ classdef ArenaScene < handle
                 
                 subfolders = A_getsubfolders(fullfile(loaded.config.leadDBS,leadDBSatlasdir));
                 options = {subfolders.name};
-                options{end+1} = '[Cracked] Distal Atlas - 100% virus free - aXXo';
+                options{end+1} = 'Distal Atlas - found in leadDBS';
                 [indx,tf] = listdlg('ListString',options,'ListSize',[400,320]);
                 if indx ~= length(options)
                     newAtlasPath = fullfile(loaded.config.leadDBS,...
@@ -1242,11 +1319,15 @@ classdef ArenaScene < handle
                     R = in.atlases.fv{iAtlas,1};
                     
                     name = in.atlases.names{iAtlas};
-                    color = in.atlases.colormap(round(in.atlases.colors(iAtlas)),:);
+                    try
+                        color = in.atlases.colormap(round(in.atlases.colors(iAtlas)),:);
+                    catch
+                        color = [1 0 0];
+                    end
                     try
                         meshR = Mesh(R.faces,R.vertices);
                     catch
-                        waitfor(msgbox('Your version of lead-dbs has a known issue with atlases. You can try the [cracked] version at the bottom of the list','lead-dbs error','error'))
+                        waitfor(msgbox('Your version of lead-dbs has a known issue with atlases. You can try the version at the bottom of the list','lead-dbs error','error'))
                         return
                     end
                     actorR = meshR.see(thisScene);
@@ -1692,6 +1773,9 @@ classdef ArenaScene < handle
                     
                 elseif isfield(loaded,'atlases')
                     import_leadDBSatlas(thisScene,loaded)
+                    return
+                elseif isfield(loaded,'mdl')
+                    A_loadheatmap(thisScene,loaded.mdl.Heatmap);
                     return
                 end
                 
@@ -2142,8 +2226,14 @@ classdef ArenaScene < handle
                 
             end
             
-            function menu_vta_review(hObject,eventdata,vta)
-                vta.review()
+            function sortedlist = menu_vta_review(hObject,eventdata,vta,OPTIONALinput)
+                if nargin==4
+                    [~,sortedlist] = vta.review(OPTIONALinput);
+                else
+                    [~, sortedlist] = vta.review();
+                end
+
+
             end
             
             function menu_therapy_prediction(hObject,eventdata,therapy)
@@ -2195,13 +2285,20 @@ classdef ArenaScene < handle
                     error('for batch review, at least two electrodes/VTAs are needed');
                     return
                 end
+                
+                input = Therapy.UserInputModule();
+                output = {};
+                outputarray = [];
+
                 for ii=1:numel(scene.VTAstorage)
-                    menu_vta_review(hObject,eventdata, scene.VTAstorage(ii));
-                    
+                    sortedlist = menu_vta_review(hObject,eventdata, scene.VTAstorage(ii),input);
+                    output{ii} = sortedlist;
+                    outputarray(:,ii) = vertcat(sortedlist.ReviewData.predictionList(:).Output);
                 end
                 
                 
                 
+                keyboard
                 %                    menu_vta_review,scene.VTAstorage(i)}
                 
             end
@@ -2856,6 +2953,7 @@ classdef ArenaScene < handle
             
             
             function menu_generateGrid(hObject,eventdata)
+                D = 0.25;
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
                 for iActor = 1:numel(currentActors)
@@ -2867,17 +2965,14 @@ classdef ArenaScene < handle
                     ymax = max(thisActor.Visualisation.handle.YData(:));
                     zmin =  min(thisActor.Visualisation.handle.ZData(:));
                     zmax = max(thisActor.Visualisation.handle.ZData(:));
-                    [x,y,z] = meshgrid(xmin:10:xmax,...
-                        ymin:10:ymax,...
-                        zmin:10:zmax);
+                    [x,y,z] = meshgrid(xmin:D:xmax,...
+                        ymin:D:ymax,...
+                        zmin:D:zmax);
                     
                     
                     pc = PointCloud([x(:),y(:),z(:)]);
                     new = pc.see(scene);
                     new.changeName(['Grid_10mm_',thisActor.Tag])
-                    
-                    
-
                 end
                 
             end
@@ -2890,7 +2985,7 @@ classdef ArenaScene < handle
                     thisActor = currentActors(iActor);
                     
                     vd = thisActor.Data.parent;
-                    Voxels = vd.Voxels;
+                    Voxels = vd.smooth().Voxels;
                     
                     skull = Voxels > 700;
                     cables = Voxels > 1800;
@@ -2899,6 +2994,9 @@ classdef ArenaScene < handle
                     indxskull = find(skull);
                     [x,y,z] = ind2sub(size(skull),indxskull);
                     cog_head_imagespace = [mean(x),mean(y),mean(z)];
+
+                    %shift center down towards midbrain
+                    cog_head_imagespace(3) = cog_head_imagespace(3) - 30/vd.R.PixelExtentInWorldZ;
                     
                     %get tips in image space
                     skeleton = bwskel(cables);
@@ -2983,6 +3081,36 @@ classdef ArenaScene < handle
                     
                 end
                 
+            end
+
+            function splitimage(hObject,eventData)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActor = ArenaScene.getSelectedActors(scene);
+
+
+                value = currentActor.Visualisation.settings.slice;
+                plane = currentActor.Visualisation.settings.plane;
+                [leftdown, rightup] = currentActor.Data.parent.getDiagonal();
+                vd = currentActor.Data.parent;
+
+                switch plane
+                    case 'axial'
+                        changeDimension = 'z';
+                        leftdown2 = rightup;
+                        leftdown2(changeDimension) = value;
+                        part1 = vd.crop(leftdown,leftdown2);
+
+                       
+
+
+                        rightup2 = leftdown;
+                        rightup2(changeDimension) = value;
+                    otherwise
+                        print('Only axial is surported yet')
+                end
+
+
+
             end
             
             function burnInImage(hObject,eventData)
@@ -3472,9 +3600,14 @@ classdef ArenaScene < handle
             function menu_mesh2binaryslice(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
                 currentActors = ArenaScene.getSelectedActors(scene);
-                
-                
-                binaryvd = currentActors(1).Data.Source.makeBinary(currentActors(1).Data.Settings.T);
+                if isempty(currentActors.Data.Source)
+                    binaryvd = VoxelData().captureMesh(currentActors.Data);
+                    
+                    
+                else
+                    binaryvd = currentActors(1).Data.Source.makeBinary(currentActors(1).Data.Settings.T);
+
+                end
                 binaryvd.getslice.see(scene)
                 
             end
@@ -4239,6 +4372,28 @@ classdef ArenaScene < handle
                     A_addToVTApool(thisActor,scene)
                 end
             end
+
+            function menu_exportSTL(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+                
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor);
+                    M = thisActor.Data.copy(); %mesh
+
+                    %RAS to LPS
+                    T = diag([-1 -1 1 1]);
+                    T(3,4) = -20; %Z-offset seems to help. Dont know why
+                    M.Vertices = SDK_transform3d(M.Vertices,T);
+
+                    %
+
+                    %save
+                    M.stlwrite([thisActor.Tag,'.stl'])
+
+                end
+
+            end
             
             function menu_seperateClusters(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
@@ -4345,6 +4500,9 @@ classdef ArenaScene < handle
                         selection = listdlg('ListString',{scene.Actors.Tag},'PromptString','Find target..',...
                             'SelectionMode','single');
                         target = scene.Actors(selection).Data;
+                        if debugmode
+                            F = Fibers;
+                        end
  
                         distances = [];
                         actors = {};
@@ -4379,7 +4537,9 @@ classdef ArenaScene < handle
                             end
 
                         end               
-                        
+                        if debugmode
+                            actor = F.see(scene);
+                        end
                         actors = actors' ;
                         distances = distances';
                 end
@@ -4405,7 +4565,7 @@ classdef ArenaScene < handle
                                         pc = PointCloud;
                                         pc.addVectors(v1);
                                         pc.addVectors(thisFiber.Vectors(iVector));
-                                        F.addFiber(pc,iVector,d(iVector));
+                                        bF.addFiber(pc,iVector,d(iVector));
                                     end
                                 end
 
@@ -4585,6 +4745,14 @@ classdef ArenaScene < handle
                 %take vertices
                 %apply PCA
                 %get the deepest point.
+                distance = norm(electrode{1}-electrode{2});
+                disp(['The distance between the two assumed contacts is: ',num2str(distance)])
+                disp('If you expected this distance to be 6mm (eg MDT3389), you can shift the electrode to average out these errors by:')
+                correction = (distance-6)/2;
+                disp(round(correction,1))
+                disp('Go to Edit > Transform > In electrode space > change the Z with the number above')
+
+
                 
             end
             
@@ -4880,6 +5048,27 @@ classdef ArenaScene < handle
                 
             end
             
+            function menu_drawbox(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActors = ArenaScene.getSelectedActors(scene);
+                for iActor = 1:numel(currentActors)
+                    thisActor = currentActors(iActor)
+                    box = [thisActor.Data.parent.R.XWorldLimits;...
+                        thisActor.Data.parent.R.YWorldLimits;...
+                        thisActor.Data.parent.R.ZWorldLimits];
+
+                    pc = PointCloud();
+                    for x = [1,2]
+                        for y = [1,2]b
+                            for z = [1,2]
+                                pc.addVectors(Vector3D(box(1,x),box(2,y),box(3,z)))
+                            end
+                        end
+                    end
+                    pc.see(scene)
+                end
+
+            end
             
             function menu_getinfo(hObject,eventdata)
                 scene = ArenaScene.getscenedata(hObject);
@@ -5439,48 +5628,65 @@ classdef ArenaScene < handle
         end
         
         function refreshLayers(obj)
-            %colors
-            pre = '<HTML><FONT color="';
-            mid = '</FONT>';
-            post = '</HTML>';
-            
-            
             ActorTags = {};
-            for i = 1:numel(obj.Actors)
-                try
-                    properties = fieldnames(obj.Actors(i).Visualisation.settings);
-                    rgbColour = obj.Actors(i).Visualisation.settings.(properties{1})*255;
-                    if isfield(obj.Actors(i).Visualisation.settings,'colorFace2') %for fibers
-                        rgbColour = obj.Actors(i).Visualisation.settings.colorFace2*255;
+            if ~isMATLABReleaseOlderThan('R2025a')
+
+                for i = 1:numel(obj.Actors)
+
+                    if obj.Actors(i).Visible
+                        bubble = '⬤';
+                    else
+                        bubble ='◯';
                     end
-                catch %no visualisation properties exist.
-                    rgbColour = [0 0 0];
+                    str = [bubble,' ', obj.Actors(i).Tag];
+                    ActorTags{i} = str;
                 end
-                
-                if isnan(rgbColour(1));rgbColour = [0 0 0];end
-                
-                hexStr = reshape( dec2hex( round(rgbColour), 2 )',1, 6);
-                
-                if obj.Actors(i).Visible
-                    bubble = '&#11044;';
-                else
-                    bubble ='&#9711;';
+                obj.handles.panelright.String = ActorTags;
+            else
+                %colors
+                pre = '<HTML><FONT color="';
+                mid = '</FONT>';
+                post = '</HTML>';
+
+                if isempty(obj)
+                    return
                 end
-                str = [pre, hexStr, '">', bubble,' ',mid, obj.Actors(i).Tag, post];
-                ActorTags{i} = str;
+                for i = 1:numel(obj.Actors)
+                    try
+                        properties = fieldnames(obj.Actors(i).Visualisation.settings);
+                        rgbColour = obj.Actors(i).Visualisation.settings.(properties{1})*255;
+                        if isfield(obj.Actors(i).Visualisation.settings,'colorFace2') %for fibers
+                            rgbColour = obj.Actors(i).Visualisation.settings.colorFace2*255;
+                        end
+                    catch %no visualisation properties exist.
+                        rgbColour = [0 0 0];
+                    end
+
+                    if isnan(rgbColour(1));rgbColour = [0 0 0];end
+
+                    hexStr = reshape( dec2hex( round(rgbColour), 2 )',1, 6);
+
+                    if obj.Actors(i).Visible
+                        bubble = '&#11044;';
+                    else
+                        bubble ='&#9711;';
+                    end
+                    str = [pre, hexStr, '">', bubble,' ',mid, obj.Actors(i).Tag, post];
+                    ActorTags{i} = str;
+                end
+                obj.handles.panelright.String = ActorTags;
             end
-            obj.handles.panelright.String = ActorTags;
-            
+
             if obj.handles.panelright.Value > numel(obj.handles.panelright.String)
                 obj.handles.panelright.Value = 1;
             end
-            
+
             obj.selectlayer()
             obj.updateMenu()
             drawnow()
-            
-            
-            
+
+
+
         end
         
         function updateMenu(obj)
