@@ -11,9 +11,11 @@ scene = newScene();
 
 
 %% Loading an image via code
-%For obvious reasons no patient scan is provided. As a placeholder A t1 
-%image originating from lead-dbs can be found. The image can be loaded 
-%in two ways:
+%For obvious reasons no patient scan is provided.
+%The following script copies a t1.nii from lead-dbs
+borrowT1FromLeadDBS()
+
+% The image can be loaded in two ways:
 %via code, or simply by the UI in this example we are going to explore the 
 % code.
 
@@ -126,6 +128,9 @@ vtaleft.getCOG()
 %4. previously we created a pointcloud with the contact centers. Let's see
 %which contact center is inside or covered by the VTA:
 vtaleft.isinside(pc)
+
+
+
 
 
 
