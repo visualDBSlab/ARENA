@@ -448,6 +448,8 @@ classdef ArenaScene < handle
             obj.handles.menu.dynamic.Slicei.generateGrid = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: generate cm-grid on slice','callback',{@menu_generateGrid},'Enable','off');
             obj.handles.menu.dynamic.Slicei.SPM = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: Use SPM to warp image to.. ','callback',{@menu_SPM},'Enable','off');
             obj.handles.menu.dynamic.Slicei.burnIn = uimenu(obj.handles.menu.dynamic.modify.main,'Text','Slice: burn in image to this actor','callback',{@burnInImage},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.split = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: split image in two images','callback',{@splitimage},'Enable','off');
+            obj.handles.menu.dynamic.Slicei.warp = uimenu(obj.handles.menu.dynamic.generate.main,'Text','Slice: reslice image on ... ','callback',{@warpto},'Enable','off');
             
             obj.handles.menu.dynamic.Fibers.interferenceWithMap = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Fibers: interference with map','callback',{@menu_fiberMapInterference},'Enable','off');
             obj.handles.menu.dynamic.Fibers.showFibersThatHitROI = uimenu(obj.handles.menu.dynamic.analyse.main,'Text','Fibers: showFibersThatHitROI','callback',{@menu_fiberROIcheck},'Enable','off');
@@ -1299,7 +1301,7 @@ classdef ArenaScene < handle
                 
                 subfolders = A_getsubfolders(fullfile(loaded.config.leadDBS,leadDBSatlasdir));
                 options = {subfolders.name};
-                options{end+1} = '[Cracked] Distal Atlas - 100% virus free - aXXo';
+                options{end+1} = 'Distal Atlas - found in leadDBS';
                 [indx,tf] = listdlg('ListString',options,'ListSize',[400,320]);
                 if indx ~= length(options)
                     newAtlasPath = fullfile(loaded.config.leadDBS,...
@@ -1318,11 +1320,15 @@ classdef ArenaScene < handle
                     R = in.atlases.fv{iAtlas,1};
                     
                     name = in.atlases.names{iAtlas};
-                    color = in.atlases.colormap(round(in.atlases.colors(iAtlas)),:);
+                    try
+                        color = in.atlases.colormap(round(in.atlases.colors(iAtlas)),:);
+                    catch
+                        color = [1 0 0];
+                    end
                     try
                         meshR = Mesh(R.faces,R.vertices);
                     catch
-                        waitfor(msgbox('Your version of lead-dbs has a known issue with atlases. You can try the [cracked] version at the bottom of the list','lead-dbs error','error'))
+                        waitfor(msgbox('Your version of lead-dbs has a known issue with atlases. You can try the version at the bottom of the list','lead-dbs error','error'))
                         return
                     end
                     actorR = meshR.see(thisScene);
@@ -3076,6 +3082,60 @@ classdef ArenaScene < handle
                     
                 end
                 
+            end
+
+            function warpto(hObject,eventdata)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActor = ArenaScene.getSelectedActors(scene);
+                
+          
+                [~,slicecandidate_name,slicecandidate_indx] = ArenaScene.getActorsOfClass(scene,'Slicei');
+                
+                
+                [indx] = listdlg('ListString',slicecandidate_name,'PromptString','Select the target image dimension');
+                target = scene.Actors(indx).Data.parent;
+
+                source = currentActor.Data.parent;
+
+                warped = source.warpto(target);
+                newActor = warped.getslice.see(scene);
+                newActor.changeName(['Warped _ ',currentActor.Tag])
+
+
+            end
+
+            function splitimage(hObject,eventData)
+                scene = ArenaScene.getscenedata(hObject);
+                currentActor = ArenaScene.getSelectedActors(scene);
+
+
+                value = currentActor.Visualisation.settings.slice;
+                plane = currentActor.Visualisation.settings.plane;
+                [leftdown, rightup] = currentActor.Data.parent.getDiagonal();
+                vd = currentActor.Data.parent;
+
+                switch plane
+                    case 'axial'
+                        changeDimension = 'z';
+                        leftdown2 = rightup;
+                        leftdown2.(changeDimension) = value;
+                        part1 = vd.crop(leftdown,leftdown2);
+                        a1 = part1.getslice.see(scene);
+                        a1.changeName(['part1 - ',currentActor.Tag])
+
+                       %----
+                        rightup2 = leftdown;
+                        rightup2.(changeDimension) = value;
+                        part2 = vd.crop(rightup2,rightup);
+                        a2 = part2.getslice.see(scene);
+                        a2.changeName(['part2 - ',currentActor.Tag])
+
+                    otherwise
+                        print('Only axial is surported yet')
+                end
+
+
+
             end
             
             function burnInImage(hObject,eventData)
