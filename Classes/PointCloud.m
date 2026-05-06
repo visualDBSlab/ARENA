@@ -108,6 +108,9 @@ classdef PointCloud < ArenaActorRendering
                     
                 case {'double', 'single'}
                     obj.Vectors = Vector3D.empty;
+                    if size(vectors,1)==3 && size(vectors,2)~=3
+                        vectors = vectors';
+                    end
                     if size(vectors,1)>1 && size(vectors,2)==3 %list
                         Vectors = Vector3D.empty;
                         parfor i = 1:size(vectors,1)
@@ -139,7 +142,9 @@ classdef PointCloud < ArenaActorRendering
             
             if isempty(thisScene);return;end %user cancels
             thisActor = thisScene.newActor(obj);
-            thisActor.changeName(inputname(1))
+            if not(isempty(inputname(1)))
+                thisActor.changeName(inputname(1))
+            end
             
             varargout{1} = thisActor;
             varargout{2} = thisScene;

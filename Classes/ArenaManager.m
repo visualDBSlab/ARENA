@@ -29,6 +29,7 @@ classdef ArenaManager < handle
             
             warning('off','all')
             addpath(genpath(config.SDKdir))
+            addpath(genpath(fileparts(fileparts(mfilename('fullpath')))))
             warning('on','all')
             
             

@@ -59,7 +59,7 @@ e = Electrode();
 %write that as a 3 number array. Or we can convert it to a Vector3D which
 %is the ARENA way of of describing a point in 3D space.
 c0 = [-19.12,-8.46,-4.65]; 
-c0_v3d = Vector3D(c0);
+c0_v3d = Vector3D(c0)
 
 %either of those can be used the set the C0 property.
 e.C0 = c0;
