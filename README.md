@@ -108,6 +108,33 @@ _Find example 1_
 > type `edit example1` to find the first script. It is not recommended to run the entire script at once. Use it to copy lines of code to the command window or use it in your own script. The examples simply provide ideas.
 
 
+# Add your own custom workflow as an add-on
+
+It is possible to add your own workflow to the ARENA menu. At startup ARENA scans the add-on folder for packages that fit the criteria. If your package matches the criteria it will show up in the menu.
+
+Let's assume your workflow is named 'myWorkflow'
+These are the basic criteria for adding this as a add-on:
+1. Make a folder /ARENA/add-ons/myWorkflow
+2. Make an installation file 'install_myWorkflow.m'
+3. Prefix all functions with your add-on name for example 'myWorkflow_function1.m'
+
+The installation script should describe the toolbar menu. 
+
+```
+install_myWorkflow(menuhandle,eventdata,scene)
+
+ level_1_menu_item = scene.addon_addmenuitem('myWorkflow','This is a toplevel menu item');
+ scene.addon_addmenuitem('myWorkflow','Run function 1',str2func('@myWorkflow_function1'),level_1_menu_item)
+ 
+ menuhandle.Text = menuhandle.Text(6:end); %sremove 'install ' from the menu name now it is installed
+ disp('Docking complete')
+
+end
+```
+
+function1 should have three input arguments: menuhandle, eventdata, scene.
+via scene, you have access to all data, and all actors inside the scene. 
+
 
 
 
