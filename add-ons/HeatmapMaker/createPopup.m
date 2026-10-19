@@ -303,6 +303,7 @@ initiateTable();
         
 
         struct2table(T)
+        assignin('base','T',T)
         
         
         
@@ -333,20 +334,20 @@ initiateTable();
         drawnow()
     end
 
-    function syncTable()
-        [fol,fil] = generateFileName();
-        if exist(fullfile(fol,fil),'file')
-            Tread = readtable(fullfile(fol,fil));
-            popupdata.table = Tread(1:end,2:end); %strip the row column
-            
-            buttonstartindx.Value = find(isnan(Tread.e1),1)+1;
-            buttonstartindx.ForegroundColor = [1 0 0];
-            %sync
-            keyboard
-            updateTable
-        end
+    % function syncTable()
+    %     [fol,fil] = generateFileName();
+    %     if exist(fullfile(fol,fil),'file')
+    %         Tread = readtable(fullfile(fol,fil));
+    %         popupdata.table = Tread(1:end,2:end); %strip the row column
+    % 
+    %         buttonstartindx.Value = find(isnan(Tread.e1),1)+1;
+    %         buttonstartindx.ForegroundColor = [1 0 0];
+    %         %sync
+    %         keyboard
+    %         updateTable
+    %     end
             
         
-    end
+    % end
     
 end

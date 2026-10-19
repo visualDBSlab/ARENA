@@ -12,6 +12,7 @@ scene.addon_addmenuitem('HeatmapMaker','Train a prediction algorithm (LOO)',str2
 scene.addon_addmenuitem('HeatmapMaker','Predict a cohort',str2func('@HeatmapMaker_applyPrediction'),prediction)
 scene.addon_addmenuitem('HeatmapMaker','Simulate Cross Validation (LOOCV)',str2func('@HeatmapMaker_LOOCV'),prediction)
 scene.addon_addmenuitem('HeatmapMaker','Simulate Cross Validation with covariates',str2func('@HeatmapMaker_LOOCV_covariates'),prediction)
+scene.addon_addmenuitem('HeatmapMaker','Test model on another outcome (+ covariates)',str2func('@HeatmapMaker_testOtherOutcome'),prediction)
 
 expert = scene.addon_addmenuitem('HeatmapMaker','Expert pipeline');
 scene.addon_addmenuitem('HeatmapMaker','1a. Make a recipe based on electrodes in scene',str2func('@HeatmapMaker_exportLeftRightElectrodeToRecipe'),expert)
