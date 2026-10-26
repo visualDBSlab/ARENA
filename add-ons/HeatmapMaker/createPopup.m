@@ -330,6 +330,7 @@ initiateTable();
         popupdata.table.Properties.VariableNames = columnnames;
         set(tableHandle,'Data',popupdata.table{:,:},'ColumnName',columnnames)
         assignin('base','data',popupdata)
+        assignin('base','resultsTable',popupdata.table);
         drawnow()
     end
 
@@ -339,7 +340,12 @@ initiateTable();
             Tread = readtable(fullfile(fol,fil));
             popupdata.table = Tread(1:end,2:end); %strip the row column
             
-            buttonstartindx.Value = find(isnan(Tread.e1),1)+1;
+            idx = find(isnan(Tread.e1),1);
+            if isempty(idx)
+                buttonstartindx.Value = 1;          % everything already done → default to first
+            else
+                buttonstartindx.Value = idx+1;
+            end;
             buttonstartindx.ForegroundColor = [1 0 0];
             %sync
             keyboard
