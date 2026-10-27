@@ -102,7 +102,7 @@ initiateTable();
 
     function export(hObject,eventdata)
         [fol,fil] = generateFileName();
-        writetable(popupdata.table,fullfile(fol,fil),'WriteRowNames',true)
+        writetable(popupdata.table,fullfile(fol,fil),'WriteRowNames',true,'WriteMode','replacefile')
     end
 
     function [foldername,filename] = generateFileName()
@@ -334,6 +334,7 @@ initiateTable();
         drawnow()
     end
 
+<<<<<<< Updated upstream
     % function syncTable()
     %     [fol,fil] = generateFileName();
     %     if exist(fullfile(fol,fil),'file')
@@ -349,5 +350,43 @@ initiateTable();
             
         
     % end
+=======
+    function syncTable()
+        [fol,fil] = generateFileName();
+        if exist(fullfile(fol,fil),'file')
+            Tread = readtable(fullfile(fol,fil),'VariableNamingRule','preserve');
+            % files written with row names have a 'Row' column with the therapy names
+            if any(strcmp(Tread.Properties.VariableNames,'Row'))
+                rowsInFile = Tread.Row;
+                Tread.Row = [];
+            else
+                n = min(height(Tread),height(popupdata.table));
+                rowsInFile = popupdata.table.Properties.RowNames(1:n);
+                Tread = Tread(1:n,:);
+            end
+
+            % keep the current, correct table layout and copy matching values in
+            fresh = popupdata.table;
+            [~,ia,ib] = intersect(fresh.Properties.RowNames, rowsInFile, 'stable');
+            common = intersect(fresh.Properties.VariableNames, Tread.Properties.VariableNames, 'stable');
+            for c = 1:numel(common)
+                col = Tread.(common{c});
+                if isnumeric(col)
+                    fresh.(common{c})(ia) = col(ib);
+                end
+            end
+            popupdata.table = fresh;
+
+            idx = find(isnan(fresh.e1),1);
+            if isempty(idx)
+                buttonstartindx.Value = 1;          % everything already done -> default to first
+            else
+                buttonstartindx.Value = idx+1;
+            end
+            buttonstartindx.ForegroundColor = [1 0 0];
+            updateTable
+        end
+    end
+>>>>>>> Stashed changes
     
 end
